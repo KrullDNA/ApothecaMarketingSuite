@@ -48,61 +48,80 @@ final class RfmEngine
 
     /**
      * Calculate RFM scores for all subscribers with order history.
+     * Processes in batches of 500.
      */
     public function calculate_all(): void
     {
         global $wpdb;
 
         $table = $wpdb->prefix . 'ams_subscribers';
+        $batch_size = 500;
 
-        // Get all subscribers who have placed at least one order.
-        $subscribers = $wpdb->get_results(
-            "SELECT id, email, total_orders, total_spent, last_order_date, rfm_segment
-             FROM {$table}
-             WHERE total_orders > 0 AND last_order_date IS NOT NULL"
+        // First pass: collect all F and M values for quintile boundaries.
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+        $frequencies = $wpdb->get_col(
+            "SELECT total_orders FROM {$table} WHERE total_orders > 0 AND last_order_date IS NOT NULL ORDER BY total_orders ASC"
+        );
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+        $monetaries = $wpdb->get_col(
+            "SELECT total_spent FROM {$table} WHERE total_orders > 0 AND last_order_date IS NOT NULL ORDER BY total_spent ASC"
         );
 
-        if (empty($subscribers)) {
+        if (empty($frequencies)) {
             return;
         }
 
-        // Calculate quintile boundaries for F and M.
-        $frequencies = array_map(fn($s) => (int) $s->total_orders, $subscribers);
-        $monetaries = array_map(fn($s) => (float) $s->total_spent, $subscribers);
-
-        sort($frequencies);
-        sort($monetaries);
+        $frequencies = array_map('intval', $frequencies);
+        $monetaries = array_map('floatval', $monetaries);
 
         $f_boundaries = $this->quintile_boundaries($frequencies);
         $m_boundaries = $this->quintile_boundaries($monetaries);
 
         $now = time();
         $repo = new SubscriberRepository();
+        $offset = 0;
 
-        foreach ($subscribers as $sub) {
-            $days_since = $sub->last_order_date
-                ? max(0, (int) (($now - strtotime($sub->last_order_date)) / DAY_IN_SECONDS))
-                : 9999;
+        do {
+            // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+            $subscribers = $wpdb->get_results($wpdb->prepare(
+                "SELECT id, total_orders, total_spent, last_order_date, rfm_segment
+                 FROM {$table}
+                 WHERE total_orders > 0 AND last_order_date IS NOT NULL
+                 ORDER BY id ASC LIMIT %d OFFSET %d",
+                $batch_size,
+                $offset
+            ));
 
-            $r = $this->recency_score($days_since);
-            $f = $this->score_by_boundaries((int) $sub->total_orders, $f_boundaries);
-            $m = $this->score_by_boundaries((float) $sub->total_spent, $m_boundaries);
-
-            $rfm_score = "{$r}{$f}{$m}";
-            $rfm_segment = $this->assign_segment($r, $f, $m);
-
-            $old_segment = $sub->rfm_segment ?? '';
-
-            $repo->update((int) $sub->id, [
-                'rfm_score'   => $rfm_score,
-                'rfm_segment' => $rfm_segment,
-            ]);
-
-            // Fire segment change action if changed.
-            if ($old_segment !== '' && $old_segment !== $rfm_segment) {
-                do_action('ams_rfm_segment_changed', (int) $sub->id, $old_segment, $rfm_segment);
+            if (empty($subscribers)) {
+                break;
             }
-        }
+
+            foreach ($subscribers as $sub) {
+                $days_since = $sub->last_order_date
+                    ? max(0, (int) (($now - strtotime($sub->last_order_date)) / DAY_IN_SECONDS))
+                    : 9999;
+
+                $r = $this->recency_score($days_since);
+                $f = $this->score_by_boundaries((int) $sub->total_orders, $f_boundaries);
+                $m = $this->score_by_boundaries((float) $sub->total_spent, $m_boundaries);
+
+                $rfm_score = "{$r}{$f}{$m}";
+                $rfm_segment = $this->assign_segment($r, $f, $m);
+
+                $old_segment = $sub->rfm_segment ?? '';
+
+                $repo->update((int) $sub->id, [
+                    'rfm_score'   => $rfm_score,
+                    'rfm_segment' => $rfm_segment,
+                ]);
+
+                if ($old_segment !== '' && $old_segment !== $rfm_segment) {
+                    do_action('ams_rfm_segment_changed', (int) $sub->id, $old_segment, $rfm_segment);
+                }
+            }
+
+            $offset += $batch_size;
+        } while (count($subscribers) === $batch_size);
     }
 
     /**

@@ -45,7 +45,7 @@ final class AnalyticsAggregator
 
         if (!as_has_scheduled_action(self::HOOK)) {
             as_schedule_recurring_action(
-                time(),
+                strtotime('tomorrow 2:00am UTC'),
                 DAY_IN_SECONDS,
                 self::HOOK,
                 [],

@@ -172,10 +172,10 @@ final class EventTracker
             esc_js($nonce)
         );
 
-        wp_add_inline_script('jquery', $script);
-
-        // Also register AJAX handlers.
-        $this->register_ajax_handlers();
+        // Output inline script via wp_footer — no jQuery dependency.
+        add_action('wp_footer', function () use ($script) {
+            echo '<script>' . $script . '</script>';
+        });
     }
 
     /**

@@ -155,11 +155,8 @@ final class AnalyticsController
 
         global $wpdb;
 
-        // Active subscribers (latest snapshot).
-        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-        $active = (int) $wpdb->get_var(
-            "SELECT COUNT(*) FROM {$this->subs_table} WHERE status = 'subscribed'"
-        );
+        // Active subscribers (cached, 1-hour TTL).
+        $active = \Apotheca\Marketing\Cache::subscriber_count();
 
         // AOV from attributed orders in range.
         // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared

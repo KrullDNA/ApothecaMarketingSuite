@@ -88,6 +88,7 @@ register_activation_hook(__FILE__, function (): void {
 register_deactivation_hook(__FILE__, function (): void {
     if (function_exists('as_unschedule_all_actions')) {
         as_unschedule_all_actions('ams_sync_dispatch');
+        as_unschedule_all_actions('ams_sync_dispatch_retry');
     }
 });
 
@@ -135,9 +136,20 @@ final class Plugin
     public static function uninstall(): void
     {
         global $wpdb;
+
+        // Drop sync log table.
         // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
         $wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}ams_sync_log");
+
+        // Delete options.
         delete_option(AMS_SYNC_SETTINGS_KEY);
+        delete_option('ams_sync_last_success');
+
+        // Clean up all pending Action Scheduler jobs.
+        if (function_exists('as_unschedule_all_actions')) {
+            as_unschedule_all_actions('ams_sync_dispatch');
+            as_unschedule_all_actions('ams_sync_dispatch_retry');
+        }
     }
 }
 

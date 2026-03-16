@@ -16,6 +16,18 @@ final class Assets
     public function __construct()
     {
         add_action('admin_enqueue_scripts', [$this, 'enqueue']);
+        add_filter('script_loader_tag', [$this, 'defer_scripts'], 10, 2);
+    }
+
+    /**
+     * Add defer attribute to AMS admin scripts.
+     */
+    public function defer_scripts(string $tag, string $handle): string
+    {
+        if (str_starts_with($handle, 'ams-')) {
+            return str_replace(' src', ' defer src', $tag);
+        }
+        return $tag;
     }
 
     /**

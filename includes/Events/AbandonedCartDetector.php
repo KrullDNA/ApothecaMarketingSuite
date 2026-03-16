@@ -80,7 +80,7 @@ final class AbandonedCartDetector
                      AND e3.created_at > e.created_at
                )
              ORDER BY e.created_at DESC
-             LIMIT 100",
+             LIMIT 200",
             $cutoff
         ));
 

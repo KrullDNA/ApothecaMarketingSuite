@@ -20,6 +20,18 @@ final class FormLoader
     {
         add_action('wp_enqueue_scripts', [$this, 'maybe_enqueue'], 20);
         add_shortcode('ams_form', [$this, 'shortcode']);
+        add_filter('script_loader_tag', [$this, 'defer_script'], 10, 2);
+    }
+
+    /**
+     * Add defer attribute to the front-end forms script.
+     */
+    public function defer_script(string $tag, string $handle): string
+    {
+        if ($handle === 'ams-forms') {
+            return str_replace(' src', ' defer src', $tag);
+        }
+        return $tag;
     }
 
     /**
