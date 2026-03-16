@@ -241,6 +241,14 @@ final class Plugin
 
         // AI REST API.
         new API\AiController();
+
+        // Email template editor REST API.
+        new API\EmailEditorController();
+
+        // Elementor widgets (loaded only when Elementor is active).
+        if (did_action('elementor/loaded')) {
+            new Elementor\WidgetLoader();
+        }
     }
 
     /**

@@ -65,3 +65,6 @@ if (function_exists('as_unschedule_all_actions')) {
 // Clean up encrypted credentials.
 delete_option('ams_sms_credentials');
 delete_option('ams_ai_credentials');
+
+// Clean up email templates.
+delete_option('ams_email_templates');
