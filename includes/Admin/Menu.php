@@ -79,6 +79,11 @@ final class Menu
                 'callback' => 'render_analytics',
             ],
             [
+                'slug'     => 'ams-ai-settings',
+                'title'    => __('AI Settings', 'apotheca-marketing-suite'),
+                'callback' => 'render_ai_settings',
+            ],
+            [
                 'slug'     => 'ams-settings',
                 'title'    => __('Settings', 'apotheca-marketing-suite'),
                 'callback' => 'render_settings',
@@ -138,6 +143,11 @@ final class Menu
     public function render_analytics(): void
     {
         $this->render_page_wrapper('Analytics', 'analytics');
+    }
+
+    public function render_ai_settings(): void
+    {
+        $this->render_page_wrapper('AI Settings', 'ai-settings');
     }
 
     public function render_settings(): void

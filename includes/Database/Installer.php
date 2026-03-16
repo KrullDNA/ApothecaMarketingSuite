@@ -38,6 +38,7 @@ final class Installer
         $sql .= $this->get_flow_enrolments_schema($prefix, $charset_collate);
         $sql .= $this->get_attributions_schema($prefix, $charset_collate);
         $sql .= $this->get_analytics_daily_schema($prefix, $charset_collate);
+        $sql .= $this->get_ai_log_schema($prefix, $charset_collate);
 
         dbDelta($sql);
     }
@@ -67,6 +68,7 @@ final class Installer
             total_spent decimal(12,2) DEFAULT 0.00 NOT NULL,
             last_order_date datetime DEFAULT NULL,
             sms_opt_in tinyint(1) DEFAULT 0 NOT NULL,
+            best_send_hour tinyint(2) unsigned DEFAULT 10 NOT NULL,
             unsubscribe_token varchar(64) DEFAULT '' NOT NULL,
             created_at datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
             updated_at datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -261,6 +263,24 @@ final class Installer
             UNIQUE KEY date_metric (date, metric_key),
             KEY metric_key (metric_key),
             KEY date (date)
+        ) $charset_collate;\n\n";
+    }
+
+    private function get_ai_log_schema(string $prefix, string $charset_collate): string
+    {
+        return "CREATE TABLE {$prefix}ams_ai_log (
+            id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+            feature varchar(50) NOT NULL,
+            input_summary text DEFAULT NULL,
+            output_summary text DEFAULT NULL,
+            tokens_used int(10) unsigned DEFAULT 0 NOT NULL,
+            cost_usd decimal(8,4) DEFAULT 0.0000 NOT NULL,
+            subscriber_id bigint(20) unsigned DEFAULT NULL,
+            created_at datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+            PRIMARY KEY  (id),
+            KEY feature (feature),
+            KEY subscriber_id (subscriber_id),
+            KEY created_at (created_at)
         ) $charset_collate;\n\n";
     }
 

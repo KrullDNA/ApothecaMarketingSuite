@@ -32,7 +32,7 @@ define('AMS_PLUGIN_FILE', __FILE__);
 define('AMS_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('AMS_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('AMS_PLUGIN_BASENAME', plugin_basename(__FILE__));
-define('AMS_DB_VERSION', '1.4.0');
+define('AMS_DB_VERSION', '1.5.0');
 define('AMS_SETTINGS_KEY', 'ams_settings');
 
 /**
@@ -96,6 +96,10 @@ register_deactivation_hook(__FILE__, function (): void {
         as_unschedule_all_actions('ams_send_sms_async');
         as_unschedule_all_actions('ams_send_sms_retry');
         as_unschedule_all_actions('ams_analytics_aggregate');
+        as_unschedule_all_actions('ams_ai_generate_subjects');
+        as_unschedule_all_actions('ams_ai_generate_email_body');
+        as_unschedule_all_actions('ams_send_time_optimise');
+        as_unschedule_all_actions('ams_ai_segment_suggestions');
     }
 
     flush_rewrite_rules();
@@ -228,6 +232,15 @@ final class Plugin
 
         // Analytics dashboard REST API.
         new API\AnalyticsController();
+
+        // AI features — async generators and send-time optimiser.
+        new AI\SubjectLineGenerator();
+        new AI\EmailBodyGenerator();
+        new AI\SendTimeOptimiser();
+        new AI\SegmentSuggester();
+
+        // AI REST API.
+        new API\AiController();
     }
 
     /**

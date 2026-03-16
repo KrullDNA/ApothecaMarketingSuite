@@ -41,6 +41,13 @@ final class Settings
             'attribution_window_days'  => 5,
             'unsubscribe_page_title'   => 'Unsubscribe',
             'unsubscribe_page_message' => 'You have been successfully unsubscribed.',
+            'ai_subject_lines_enabled'       => true,
+            'ai_email_body_enabled'          => true,
+            'ai_send_time_enabled'           => true,
+            'ai_product_recs_enabled'        => true,
+            'ai_segment_suggestions_enabled' => true,
+            'ai_monthly_token_budget'        => 500000,
+            'ai_product_card_template'       => '',
         ];
     }
 

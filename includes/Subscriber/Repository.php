@@ -222,7 +222,7 @@ final class Repository
             }
         }
 
-        $int_fields = ['gdpr_consent', 'total_orders', 'churn_risk_score', 'sms_opt_in'];
+        $int_fields = ['gdpr_consent', 'total_orders', 'churn_risk_score', 'sms_opt_in', 'best_send_hour'];
         foreach ($int_fields as $field) {
             if (array_key_exists($field, $data)) {
                 $sanitized[$field] = (int) $data[$field];

@@ -53,6 +53,11 @@ final class Assets
         if (str_contains($screen->id, 'ams-analytics')) {
             $this->enqueue_analytics_dashboard();
         }
+
+        // AI settings — only on the AI Settings page.
+        if (str_contains($screen->id, 'ams-ai-settings')) {
+            $this->enqueue_ai_settings();
+        }
     }
 
     /**
@@ -126,6 +131,25 @@ final class Assets
         );
 
         wp_localize_script('ams-analytics-dashboard', 'amsAnalytics', [
+            'restUrl' => rest_url('ams/v1/'),
+            'nonce'   => wp_create_nonce('wp_rest'),
+        ]);
+    }
+
+    /**
+     * Enqueue the AI settings bundle.
+     */
+    private function enqueue_ai_settings(): void
+    {
+        wp_enqueue_script(
+            'ams-ai-settings',
+            AMS_PLUGIN_URL . 'assets/js/ai-settings.js',
+            ['wp-element', 'wp-api-fetch'],
+            AMS_VERSION,
+            true
+        );
+
+        wp_localize_script('ams-ai-settings', 'amsAiSettings', [
             'restUrl' => rest_url('ams/v1/'),
             'nonce'   => wp_create_nonce('wp_rest'),
         ]);

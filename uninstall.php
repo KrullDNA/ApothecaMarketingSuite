@@ -32,6 +32,7 @@ $tables = [
     $wpdb->prefix . 'ams_flow_enrolments',
     $wpdb->prefix . 'ams_attributions',
     $wpdb->prefix . 'ams_analytics_daily',
+    $wpdb->prefix . 'ams_ai_log',
 ];
 
 foreach ($tables as $table) {
@@ -55,7 +56,12 @@ if (function_exists('as_unschedule_all_actions')) {
     as_unschedule_all_actions('ams_send_sms_async');
     as_unschedule_all_actions('ams_send_sms_retry');
     as_unschedule_all_actions('ams_analytics_aggregate');
+    as_unschedule_all_actions('ams_ai_generate_subjects');
+    as_unschedule_all_actions('ams_ai_generate_email_body');
+    as_unschedule_all_actions('ams_send_time_optimise');
+    as_unschedule_all_actions('ams_ai_segment_suggestions');
 }
 
-// Clean up encrypted SMS credentials.
+// Clean up encrypted credentials.
 delete_option('ams_sms_credentials');
+delete_option('ams_ai_credentials');

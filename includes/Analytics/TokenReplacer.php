@@ -110,6 +110,13 @@ final class TokenReplacer
         $tokens['{{unsubscribe_url}}']        = $unsub_url;
         $tokens['{{manage_preferences_url}}'] = $context['manage_preferences_url'] ?? $unsub_url;
 
+        // AI product recommendations token (lazy-evaluated at render time).
+        if ($subscriber) {
+            $tokens['{{ai_product_recommendations}}'] = \Apotheca\Marketing\AI\ProductRecommender::render_html((int) $subscriber->id);
+        } else {
+            $tokens['{{ai_product_recommendations}}'] = '';
+        }
+
         return $tokens;
     }
 
