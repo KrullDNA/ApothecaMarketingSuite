@@ -94,6 +94,11 @@ final class Menu
                 'callback' => 'render_reviews',
             ],
             [
+                'slug'     => 'ams-sync',
+                'title'    => __('Sync', 'apotheca-marketing-suite'),
+                'callback' => 'render_sync',
+            ],
+            [
                 'slug'     => 'ams-settings',
                 'title'    => __('Settings', 'apotheca-marketing-suite'),
                 'callback' => 'render_settings',
@@ -168,6 +173,11 @@ final class Menu
     public function render_email_editor(): void
     {
         $this->render_page_wrapper('Email Editor', 'email-editor');
+    }
+
+    public function render_sync(): void
+    {
+        $this->render_page_wrapper('Sync', 'sync-settings');
     }
 
     public function render_settings(): void

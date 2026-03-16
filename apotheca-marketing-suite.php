@@ -255,6 +255,11 @@ final class Plugin
         if (did_action('elementor/loaded')) {
             new Elementor\WidgetLoader();
         }
+
+        // Subdomain sync — ingest endpoint, SSO handler, sync settings REST API.
+        new API\SyncIngestController();
+        new Sync\SSOHandler();
+        new API\SyncSettingsController();
     }
 
     /**

@@ -51,6 +51,9 @@ final class Settings
             'reviews_min_rating'             => 4,
             'reviews_private_feedback_page'  => 0,
             'reviews_gate_expiry_hours'      => 72,
+            'sync_shared_secret'             => '',
+            'sync_shared_secret_encrypted'   => '',
+            'sync_allowed_domain'            => '',
         ];
     }
 

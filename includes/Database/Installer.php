@@ -40,6 +40,7 @@ final class Installer
         $sql .= $this->get_analytics_daily_schema($prefix, $charset_collate);
         $sql .= $this->get_ai_log_schema($prefix, $charset_collate);
         $sql .= $this->get_reviews_cache_schema($prefix, $charset_collate);
+        $sql .= $this->get_sync_inbound_log_schema($prefix, $charset_collate);
 
         dbDelta($sql);
     }
@@ -308,6 +309,22 @@ final class Installer
             KEY rating (rating),
             KEY cached_at (cached_at),
             KEY product_rating (product_id, rating)
+        ) $charset_collate;\n\n";
+    }
+
+    private function get_sync_inbound_log_schema(string $prefix, string $charset_collate): string
+    {
+        return "CREATE TABLE {$prefix}ams_sync_inbound_log (
+            id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+            event_type varchar(50) NOT NULL,
+            source_site_url varchar(500) DEFAULT '' NOT NULL,
+            payload_hash varchar(16) DEFAULT '' NOT NULL,
+            http_response_sent smallint(3) unsigned DEFAULT 200 NOT NULL,
+            received_at datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+            PRIMARY KEY  (id),
+            KEY event_type (event_type),
+            KEY received_at (received_at),
+            KEY http_response_sent (http_response_sent)
         ) $charset_collate;\n\n";
     }
 

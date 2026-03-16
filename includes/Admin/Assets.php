@@ -68,6 +68,11 @@ final class Assets
         if (str_contains($screen->id, 'ams-reviews')) {
             $this->enqueue_reviews_settings();
         }
+
+        // Sync settings — only on the Sync page.
+        if (str_contains($screen->id, 'ams-sync')) {
+            $this->enqueue_sync_settings();
+        }
     }
 
     /**
@@ -215,6 +220,20 @@ final class Assets
             'restUrl' => rest_url('ams/v1/'),
             'nonce'   => wp_create_nonce('wp_rest'),
         ]);
+    }
+
+    /**
+     * Enqueue the sync settings bundle.
+     */
+    private function enqueue_sync_settings(): void
+    {
+        wp_enqueue_script(
+            'ams-sync-settings',
+            AMS_PLUGIN_URL . 'assets/js/sync-settings.js',
+            ['wp-element', 'wp-api-fetch'],
+            AMS_VERSION,
+            true
+        );
     }
 
     /**

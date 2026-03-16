@@ -34,6 +34,7 @@ $tables = [
     $wpdb->prefix . 'ams_analytics_daily',
     $wpdb->prefix . 'ams_ai_log',
     $wpdb->prefix . 'ams_reviews_cache',
+    $wpdb->prefix . 'ams_sync_inbound_log',
 ];
 
 foreach ($tables as $table) {
@@ -73,3 +74,6 @@ delete_option('ams_email_templates');
 
 // Clean up reviews cache metadata.
 delete_option('ams_reviews_last_refresh');
+
+// Clean up sync metadata.
+delete_option('ams_sync_last_received');
