@@ -1,0 +1,184 @@
+/**
+ * Apotheca® Marketing Suite — Elementor widget styles.
+ */
+
+/* Opt-In Form */
+.ams-optin-form {
+    max-width: 500px;
+}
+
+.ams-optin-form__inner {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.ams-optin-form__input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.ams-optin-form__button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    background-color: #7c3aed;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.ams-optin-form__button:hover {
+    background-color: #6d28d9;
+}
+
+.ams-optin-form__success {
+    padding: 12px;
+    background: #ecfdf5;
+    color: #065f46;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+/* Subscriber Count Badge */
+.ams-subscriber-badge {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.ams-subscriber-badge__count {
+    font-size: 2em;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.ams-subscriber-badge__text {
+    font-size: 1em;
+    opacity: 0.8;
+}
+
+/* Campaign Archive — Grid */
+.ams-campaign-grid {
+    display: grid;
+    gap: 20px;
+}
+
+.ams-campaign-grid--cols-1 { grid-template-columns: 1fr; }
+.ams-campaign-grid--cols-2 { grid-template-columns: repeat(2, 1fr); }
+.ams-campaign-grid--cols-3 { grid-template-columns: repeat(3, 1fr); }
+.ams-campaign-grid--cols-4 { grid-template-columns: repeat(4, 1fr); }
+
+@media (max-width: 767px) {
+    .ams-campaign-grid--cols-2,
+    .ams-campaign-grid--cols-3,
+    .ams-campaign-grid--cols-4 {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Campaign Archive — List */
+.ams-campaign-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Campaign Card */
+.ams-campaign-card {
+    padding: 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: #fff;
+}
+
+.ams-campaign-card__title {
+    font-weight: 600;
+    font-size: 16px;
+    margin-bottom: 4px;
+}
+
+.ams-campaign-card__subject {
+    font-size: 14px;
+    color: #6b7280;
+    margin-bottom: 4px;
+}
+
+.ams-campaign-card__date {
+    font-size: 13px;
+    color: #9ca3af;
+}
+
+/* Campaign Archive — Empty */
+.ams-campaign-archive__empty {
+    color: #9ca3af;
+    text-align: center;
+    padding: 20px;
+}
+
+/* Preference Centre */
+.ams-pref-centre {
+    max-width: 500px;
+}
+
+.ams-pref-centre__heading {
+    margin-bottom: 16px;
+}
+
+.ams-pref-centre__form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.ams-pref-centre__toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.ams-pref-centre__toggle input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #7c3aed;
+}
+
+.ams-pref-centre__save {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    background-color: #7c3aed;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    align-self: flex-start;
+    transition: background-color 0.2s ease;
+}
+
+.ams-pref-centre__save:hover {
+    background-color: #6d28d9;
+}
+
+.ams-pref-centre__success {
+    padding: 10px;
+    background: #ecfdf5;
+    color: #065f46;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.ams-pref-centre__not-identified {
+    color: #6b7280;
+    font-size: 14px;
+}

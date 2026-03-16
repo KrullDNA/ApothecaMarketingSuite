@@ -1,0 +1,44 @@
+{
+    "name": "Post-Purchase Thank You",
+    "description": "2-step flow: immediate thank-you email, day 7 review gate email with star rating capture.",
+    "trigger_type": "post_purchase",
+    "trigger_config": {},
+    "steps": [
+        {
+            "step_type": "send_email",
+            "step_order": 0,
+            "delay_value": 0,
+            "delay_unit": "minutes",
+            "subject": "Thank you for your order, {{first_name}}!",
+            "preview_text": "We appreciate your business.",
+            "body_html": "<h1>Thank You!</h1><p>Hi {{first_name}},</p><p>Thank you for shopping with {{shop_name}}. We truly appreciate your business and hope you love your purchase.</p><p>If you have any questions about your order, don't hesitate to reach out to our support team.</p><p><a href=\"{{shop_url}}\">Continue Shopping</a></p>",
+            "body_text": "Hi {{first_name}}, thank you for your order at {{shop_name}}. We hope you love your purchase. Continue shopping at {{shop_url}}.",
+            "sms_body": "",
+            "conditions": []
+        },
+        {
+            "step_type": "wait",
+            "step_order": 1,
+            "delay_value": 7,
+            "delay_unit": "days",
+            "subject": "",
+            "preview_text": "",
+            "body_html": "",
+            "body_text": "",
+            "sms_body": "",
+            "conditions": []
+        },
+        {
+            "step_type": "send_email",
+            "step_order": 2,
+            "delay_value": 0,
+            "delay_unit": "minutes",
+            "subject": "How was your experience, {{first_name}}?",
+            "preview_text": "We'd love to hear your thoughts.",
+            "body_html": "<h1>Share Your Experience</h1><p>Hi {{first_name}},</p><p>It's been a week since your order arrived — we'd love to hear what you think!</p><p>How would you rate your experience?</p><table role=\"presentation\" cellspacing=\"0\" cellpadding=\"0\" border=\"0\" style=\"margin:16px auto;\"><tr><td style=\"padding:0 4px;\"><a href=\"{{review_gate_url}}&rating=5\" style=\"display:inline-block;font-size:28px;text-decoration:none;\" title=\"5 stars\">&#9733;</a></td><td style=\"padding:0 4px;\"><a href=\"{{review_gate_url}}&rating=4\" style=\"display:inline-block;font-size:28px;text-decoration:none;\" title=\"4 stars\">&#9733;</a></td><td style=\"padding:0 4px;\"><a href=\"{{review_gate_url}}&rating=3\" style=\"display:inline-block;font-size:28px;text-decoration:none;\" title=\"3 stars\">&#9733;</a></td><td style=\"padding:0 4px;\"><a href=\"{{review_gate_url}}&rating=2\" style=\"display:inline-block;font-size:28px;text-decoration:none;\" title=\"2 stars\">&#9733;</a></td><td style=\"padding:0 4px;\"><a href=\"{{review_gate_url}}&rating=1\" style=\"display:inline-block;font-size:28px;text-decoration:none;\" title=\"1 star\">&#9733;</a></td></tr></table><p>{{social_proof_reviews}}</p><p>Thank you for being a valued customer.</p>",
+            "body_text": "Hi {{first_name}}, how was your recent purchase? We'd love your feedback. Rate your experience: {{review_gate_url}}&rating=5",
+            "sms_body": "",
+            "conditions": {"sub_type": "review_gate_email"}
+        }
+    ]
+}

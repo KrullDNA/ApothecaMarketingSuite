@@ -1,0 +1,271 @@
+<?php
+/**
+ * Admin asset loader — enqueues JS/CSS only on pages that need them.
+ *
+ * @package Apotheca\Marketing\Admin
+ */
+
+declare(strict_types=1);
+
+namespace Apotheca\Marketing\Admin;
+
+defined('ABSPATH') || exit;
+
+final class Assets
+{
+    public function __construct()
+    {
+        add_action('admin_enqueue_scripts', [$this, 'enqueue']);
+        add_filter('script_loader_tag', [$this, 'defer_scripts'], 10, 2);
+    }
+
+    /**
+     * Add defer attribute to AMS admin scripts.
+     */
+    public function defer_scripts(string $tag, string $handle): string
+    {
+        if (str_starts_with($handle, 'ams-')) {
+            return str_replace(' src', ' defer src', $tag);
+        }
+        return $tag;
+    }
+
+    /**
+     * Conditionally enqueue admin assets based on the current page.
+     */
+    public function enqueue(string $hook): void
+    {
+        // Only load on AMS admin pages.
+        $screen = get_current_screen();
+        if (!$screen || !str_contains($screen->id, 'ams-')) {
+            return;
+        }
+
+        // Flow builder — only on the Flows page.
+        if (str_contains($screen->id, 'ams-flows')) {
+            $this->enqueue_flow_builder();
+        }
+
+        // Segment builder — only on the Segments page.
+        if (str_contains($screen->id, 'ams-segments')) {
+            $this->enqueue_segment_builder();
+        }
+
+        // Form builder — only on the Forms page.
+        if (str_contains($screen->id, 'ams-forms')) {
+            $this->enqueue_form_builder();
+        }
+
+        // SMS campaign manager — only on the SMS page.
+        if (str_contains($screen->id, 'ams-sms')) {
+            $this->enqueue_sms_campaign();
+        }
+
+        // Analytics dashboard — only on the Analytics page.
+        if (str_contains($screen->id, 'ams-analytics')) {
+            $this->enqueue_analytics_dashboard();
+        }
+
+        // AI settings — only on the AI Settings page.
+        if (str_contains($screen->id, 'ams-ai-settings')) {
+            $this->enqueue_ai_settings();
+        }
+
+        // Email editor — only on the Email Editor page.
+        if (str_contains($screen->id, 'ams-email-editor')) {
+            $this->enqueue_email_editor();
+        }
+
+        // Reviews settings — only on the Reviews page.
+        if (str_contains($screen->id, 'ams-reviews')) {
+            $this->enqueue_reviews_settings();
+        }
+
+        // Sync settings — only on the Sync page.
+        if (str_contains($screen->id, 'ams-sync')) {
+            $this->enqueue_sync_settings();
+        }
+    }
+
+    /**
+     * Enqueue the SMS campaign manager bundle.
+     */
+    private function enqueue_sms_campaign(): void
+    {
+        wp_enqueue_script(
+            'ams-sms-campaign',
+            AMS_PLUGIN_URL . 'assets/js/sms-campaign.js',
+            ['wp-element', 'wp-api-fetch'],
+            AMS_VERSION,
+            true
+        );
+
+        wp_localize_script('ams-sms-campaign', 'amsSmsCampaign', [
+            'restUrl' => rest_url('ams/v1/'),
+            'nonce'   => wp_create_nonce('wp_rest'),
+        ]);
+    }
+
+    /**
+     * Enqueue the React form builder bundle.
+     */
+    private function enqueue_form_builder(): void
+    {
+        wp_enqueue_script(
+            'ams-form-builder',
+            AMS_PLUGIN_URL . 'assets/js/form-builder.js',
+            ['wp-element', 'wp-api-fetch'],
+            AMS_VERSION,
+            true
+        );
+
+        wp_localize_script('ams-form-builder', 'amsFormBuilder', [
+            'restUrl' => rest_url('ams/v1/'),
+            'nonce'   => wp_create_nonce('wp_rest'),
+        ]);
+    }
+
+    /**
+     * Enqueue the React segment builder bundle.
+     */
+    private function enqueue_segment_builder(): void
+    {
+        wp_enqueue_script(
+            'ams-segment-builder',
+            AMS_PLUGIN_URL . 'assets/js/segment-builder.js',
+            ['wp-element', 'wp-api-fetch'],
+            AMS_VERSION,
+            true
+        );
+
+        wp_localize_script('ams-segment-builder', 'amsSegmentBuilder', [
+            'restUrl' => rest_url('ams/v1/'),
+            'nonce'   => wp_create_nonce('wp_rest'),
+        ]);
+    }
+
+    /**
+     * Enqueue the React analytics dashboard bundle.
+     */
+    private function enqueue_analytics_dashboard(): void
+    {
+        wp_enqueue_script(
+            'ams-analytics-dashboard',
+            AMS_PLUGIN_URL . 'assets/js/analytics-dashboard.js',
+            ['wp-element', 'wp-api-fetch'],
+            AMS_VERSION,
+            true
+        );
+
+        wp_localize_script('ams-analytics-dashboard', 'amsAnalytics', [
+            'restUrl' => rest_url('ams/v1/'),
+            'nonce'   => wp_create_nonce('wp_rest'),
+        ]);
+    }
+
+    /**
+     * Enqueue the AI settings bundle.
+     */
+    private function enqueue_ai_settings(): void
+    {
+        wp_enqueue_script(
+            'ams-ai-settings',
+            AMS_PLUGIN_URL . 'assets/js/ai-settings.js',
+            ['wp-element', 'wp-api-fetch'],
+            AMS_VERSION,
+            true
+        );
+
+        wp_localize_script('ams-ai-settings', 'amsAiSettings', [
+            'restUrl' => rest_url('ams/v1/'),
+            'nonce'   => wp_create_nonce('wp_rest'),
+        ]);
+    }
+
+    /**
+     * Enqueue the reviews settings bundle.
+     */
+    private function enqueue_reviews_settings(): void
+    {
+        wp_enqueue_style(
+            'ams-reviews-settings',
+            AMS_PLUGIN_URL . 'assets/css/reviews-settings.css',
+            [],
+            AMS_VERSION
+        );
+
+        wp_enqueue_script(
+            'ams-reviews-settings',
+            AMS_PLUGIN_URL . 'assets/js/reviews-settings.js',
+            ['wp-element', 'wp-api-fetch'],
+            AMS_VERSION,
+            true
+        );
+
+        wp_localize_script('ams-reviews-settings', 'amsReviewsSettings', [
+            'restUrl' => rest_url('ams/v1/'),
+            'nonce'   => wp_create_nonce('wp_rest'),
+        ]);
+    }
+
+    /**
+     * Enqueue the visual email editor bundle.
+     */
+    private function enqueue_email_editor(): void
+    {
+        wp_enqueue_style(
+            'ams-email-editor',
+            AMS_PLUGIN_URL . 'assets/css/email-editor.css',
+            [],
+            AMS_VERSION
+        );
+
+        wp_enqueue_script(
+            'ams-email-editor',
+            AMS_PLUGIN_URL . 'assets/js/email-editor.js',
+            ['wp-element', 'wp-api-fetch'],
+            AMS_VERSION,
+            true
+        );
+
+        wp_localize_script('ams-email-editor', 'amsEmailEditor', [
+            'restUrl' => rest_url('ams/v1/'),
+            'nonce'   => wp_create_nonce('wp_rest'),
+        ]);
+    }
+
+    /**
+     * Enqueue the sync settings bundle.
+     */
+    private function enqueue_sync_settings(): void
+    {
+        wp_enqueue_script(
+            'ams-sync-settings',
+            AMS_PLUGIN_URL . 'assets/js/sync-settings.js',
+            ['wp-element', 'wp-api-fetch'],
+            AMS_VERSION,
+            true
+        );
+    }
+
+    /**
+     * Enqueue the React flow builder bundle.
+     */
+    private function enqueue_flow_builder(): void
+    {
+        // WordPress bundled React + API Fetch dependencies.
+        wp_enqueue_script(
+            'ams-flow-builder',
+            AMS_PLUGIN_URL . 'assets/js/flow-builder.js',
+            ['wp-element', 'wp-api-fetch'],
+            AMS_VERSION,
+            true
+        );
+
+        // Pass nonce and REST URL to the script.
+        wp_localize_script('ams-flow-builder', 'amsFlowBuilder', [
+            'restUrl' => rest_url('ams/v1/'),
+            'nonce'   => wp_create_nonce('wp_rest'),
+        ]);
+    }
+}

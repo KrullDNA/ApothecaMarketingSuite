@@ -1,0 +1,70 @@
+{
+    "name": "Win-Back",
+    "description": "3-step win-back: day 90 email, day 105 email with discount, day 120 SMS.",
+    "trigger_type": "win_back",
+    "trigger_config": {
+        "days_since_last_order": 90
+    },
+    "steps": [
+        {
+            "step_type": "send_email",
+            "step_order": 0,
+            "delay_value": 0,
+            "delay_unit": "minutes",
+            "subject": "We miss you, {{first_name}}!",
+            "preview_text": "It's been a while since your last visit.",
+            "body_html": "<h1>We Miss You!</h1><p>Hi {{first_name}},</p><p>It's been a while since you shopped with us, and we wanted to check in. We've added some exciting new products that we think you'll love.</p><p><a href=\"{{site_url}}\">See What's New</a></p>",
+            "body_text": "Hi {{first_name}}, we miss you! Check out what's new at {{site_url}}.",
+            "sms_body": "",
+            "conditions": []
+        },
+        {
+            "step_type": "wait",
+            "step_order": 1,
+            "delay_value": 15,
+            "delay_unit": "days",
+            "subject": "",
+            "preview_text": "",
+            "body_html": "",
+            "body_text": "",
+            "sms_body": "",
+            "conditions": []
+        },
+        {
+            "step_type": "send_email",
+            "step_order": 2,
+            "delay_value": 0,
+            "delay_unit": "minutes",
+            "subject": "A special offer to welcome you back",
+            "preview_text": "15% off — just for you.",
+            "body_html": "<h1>Welcome Back Gift</h1><p>Hi {{first_name}},</p><p>We'd love to see you again. Here's an exclusive 15% discount as our way of saying we value you.</p><p><strong>Use code: COMEBACK15</strong></p><p><a href=\"{{site_url}}\">Shop Now & Save</a></p><p>Valid for the next 14 days.</p>",
+            "body_text": "Hi {{first_name}}, here's 15% off to welcome you back. Use code COMEBACK15 at {{site_url}}. Valid 14 days.",
+            "sms_body": "",
+            "conditions": []
+        },
+        {
+            "step_type": "wait",
+            "step_order": 3,
+            "delay_value": 15,
+            "delay_unit": "days",
+            "subject": "",
+            "preview_text": "",
+            "body_html": "",
+            "body_text": "",
+            "sms_body": "",
+            "conditions": []
+        },
+        {
+            "step_type": "send_sms",
+            "step_order": 4,
+            "delay_value": 0,
+            "delay_unit": "minutes",
+            "subject": "",
+            "preview_text": "",
+            "body_html": "",
+            "body_text": "",
+            "sms_body": "Hi {{first_name}}, it's {{site_name}}. We miss you! Your 15% discount code COMEBACK15 is about to expire. Shop now and save!",
+            "conditions": []
+        }
+    ]
+}
