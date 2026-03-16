@@ -43,15 +43,15 @@ final class SyncIngestController
         $timestamp = $request->get_header('X-AMS-Timestamp');
 
         if (!$signature || !$timestamp) {
-            $this->log_inbound('unknown', $request->get_param('site_url') ?? '', 401);
-            return new \WP_REST_Response(['error' => 'Missing signature headers.'], 401);
+            $this->log_inbound('unknown', $request->get_param('site_url') ?? '', 401, 'auth_failed');
+            return new \WP_REST_Response(['status' => 'error', 'message' => 'Missing signature headers.'], 401);
         }
 
         // Verify timestamp is within 300 seconds.
         $ts = (int) $timestamp;
         if (abs(time() - $ts) > 300) {
-            $this->log_inbound('unknown', $request->get_param('site_url') ?? '', 401);
-            return new \WP_REST_Response(['error' => 'Timestamp expired.'], 401);
+            $this->log_inbound('unknown', $request->get_param('site_url') ?? '', 401, 'auth_failed');
+            return new \WP_REST_Response(['status' => 'error', 'message' => 'Timestamp expired.'], 401);
         }
 
         // Verify HMAC signature.
@@ -62,71 +62,86 @@ final class SyncIngestController
         }
 
         if (!$shared_secret) {
-            $this->log_inbound('unknown', $request->get_param('site_url') ?? '', 500);
-            return new \WP_REST_Response(['error' => 'Sync not configured.'], 500);
+            $this->log_inbound('unknown', $request->get_param('site_url') ?? '', 500, 'error');
+            return new \WP_REST_Response(['status' => 'error', 'message' => 'Sync not configured.'], 500);
         }
 
-        $payload = $request->get_param('payload') ?? [];
-        $expected_hmac = hash_hmac('sha256', wp_json_encode($payload) . $timestamp, $shared_secret);
+        // Validate HMAC against the raw JSON request body.
+        $raw_body = $request->get_body();
+        $expected_hmac = hash_hmac('sha256', $raw_body, $shared_secret);
 
         if (!hash_equals($expected_hmac, $signature)) {
-            $this->log_inbound($request->get_param('event_type') ?? 'unknown', $request->get_param('site_url') ?? '', 401);
-            return new \WP_REST_Response(['error' => 'Invalid signature.'], 401);
+            $this->log_inbound($request->get_param('event_type') ?? 'unknown', $request->get_param('site_url') ?? '', 401, 'auth_failed');
+            return new \WP_REST_Response(['status' => 'error', 'message' => 'Invalid signature.'], 401);
         }
 
         $event_type = sanitize_text_field($request->get_param('event_type') ?? '');
         $site_url = sanitize_text_field($request->get_param('site_url') ?? '');
+        $payload = $request->get_param('payload') ?? [];
 
         // Verify allowed source domain.
         $allowed_domain = Settings::get('sync_allowed_domain', '');
         if ($allowed_domain && $site_url) {
             $source_host = wp_parse_url($site_url, PHP_URL_HOST);
             if ($source_host && $source_host !== $allowed_domain) {
-                $this->log_inbound($event_type, $site_url, 403);
-                return new \WP_REST_Response(['error' => 'Source domain not allowed.'], 403);
+                $this->log_inbound($event_type, $site_url, 403, 'auth_failed');
+                return new \WP_REST_Response(['status' => 'error', 'message' => 'Source domain not allowed.'], 403);
             }
         }
 
         // Handle test ping.
         if ($event_type === 'test_ping') {
-            $this->log_inbound($event_type, $site_url, 200);
-            return new \WP_REST_Response(['status' => 'pong'], 200);
+            $this->log_inbound($event_type, $site_url, 200, 'processed');
+            return new \WP_REST_Response(['status' => 'ok', 'event' => 'test_ping'], 200);
         }
 
         // Route to ingestor.
         $ingestor = new SyncIngestor();
         $result = $ingestor->handle($event_type, $payload);
 
-        $http_status = $result ? 200 : 422;
-        $this->log_inbound($event_type, $site_url, $http_status);
+        if ($result) {
+            $this->log_inbound($event_type, $site_url, 200, 'processed');
+            return new \WP_REST_Response(['status' => 'ok', 'event' => $event_type], 200);
+        }
 
-        return new \WP_REST_Response([
-            'status'  => $result ? 'processed' : 'error',
-            'event'   => $event_type,
-        ], $http_status);
+        // Check for unknown event type vs validation error.
+        $known_types = ['customer_registered', 'order_placed', 'order_status_changed', 'cart_updated', 'product_viewed', 'checkout_started', 'abandoned_cart', 'test_ping'];
+        if (!in_array($event_type, $known_types, true)) {
+            $this->log_inbound($event_type, $site_url, 200, 'unknown_event');
+            return new \WP_REST_Response(['status' => 'ok', 'event' => $event_type], 200);
+        }
+
+        $this->log_inbound($event_type, $site_url, 422, 'error');
+        return new \WP_REST_Response(['status' => 'error', 'message' => 'Validation failed for event: ' . $event_type], 422);
     }
 
     /**
      * Log inbound sync event.
      */
-    private function log_inbound(string $event_type, string $source_url, int $http_status): void
+    private function log_inbound(string $event_type, string $source_url, int $http_status, string $status = 'processed'): void
     {
         global $wpdb;
-        $table = $wpdb->prefix . 'ams_sync_inbound_log';
+        $table = $wpdb->prefix . 'ams_sync_log';
 
         // Check if table exists (it's created in the installer update).
         // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
         if ($wpdb->get_var("SHOW TABLES LIKE '{$table}'") !== $table) {
-            return;
+            // Fallback to legacy table name.
+            $table = $wpdb->prefix . 'ams_sync_inbound_log';
+            // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+            if ($wpdb->get_var("SHOW TABLES LIKE '{$table}'") !== $table) {
+                return;
+            }
         }
 
         $wpdb->insert($table, [
-            'event_type'        => $event_type,
-            'source_site_url'   => substr($source_url, 0, 500),
-            'payload_hash'      => substr(md5($event_type . time()), 0, 16),
+            'event_type'         => $event_type,
+            'source_site_url'    => substr($source_url, 0, 500),
+            'payload_hash'       => substr(md5($event_type . time()), 0, 16),
             'http_response_sent' => $http_status,
-            'received_at'       => current_time('mysql'),
-        ], ['%s', '%s', '%s', '%d', '%s']);
+            'status'             => $status,
+            'received_at'        => current_time('mysql'),
+        ], ['%s', '%s', '%s', '%d', '%s', '%s']);
 
         // Update last received timestamp.
         update_option('ams_sync_last_received', current_time('mysql'));

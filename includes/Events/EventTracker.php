@@ -30,23 +30,25 @@ final class EventTracker
 
     private function register_hooks(): void
     {
-        // Order placed.
-        add_action('woocommerce_checkout_order_processed', [$this, 'track_placed_order'], 20, 3);
+        if (function_exists('WC')) {
+            // Order placed.
+            add_action('woocommerce_checkout_order_processed', [$this, 'track_placed_order'], 20, 3);
 
-        // Order completed.
-        add_action('woocommerce_order_status_completed', [$this, 'track_completed_purchase'], 10, 1);
+            // Order completed.
+            add_action('woocommerce_order_status_completed', [$this, 'track_completed_purchase'], 10, 1);
 
-        // Refund requested.
-        add_action('woocommerce_order_status_refunded', [$this, 'track_refund_requested'], 10, 1);
+            // Refund requested.
+            add_action('woocommerce_order_status_refunded', [$this, 'track_refund_requested'], 10, 1);
 
-        // Product viewed.
-        add_action('woocommerce_after_single_product', [$this, 'track_viewed_product']);
+            // Product viewed.
+            add_action('woocommerce_after_single_product', [$this, 'track_viewed_product']);
 
-        // Added to cart.
-        add_action('woocommerce_add_to_cart', [$this, 'track_added_to_cart'], 10, 6);
+            // Added to cart.
+            add_action('woocommerce_add_to_cart', [$this, 'track_added_to_cart'], 10, 6);
 
-        // Started checkout.
-        add_action('woocommerce_after_checkout_form', [$this, 'track_started_checkout']);
+            // Started checkout.
+            add_action('woocommerce_after_checkout_form', [$this, 'track_started_checkout']);
+        }
 
         // Review written.
         add_action('comment_post', [$this, 'track_wrote_review'], 10, 3);
@@ -55,8 +57,11 @@ final class EventTracker
     /**
      * Track order placed event.
      */
-    public function track_placed_order(int $order_id, array $posted_data, \WC_Order $order): void
+    public function track_placed_order(int $order_id, array $posted_data, object $order): void
     {
+        if (!class_exists('WC_Order') || !($order instanceof \WC_Order)) {
+            return;
+        }
         $subscriber = $this->get_subscriber_for_order($order);
         if (!$subscriber) {
             return;
@@ -98,6 +103,12 @@ final class EventTracker
      */
     public function track_completed_purchase(int $order_id): void
     {
+        // NOTE: On standalone deployment this value is populated via the
+        // AMS ingest endpoint receiving data from the remote WooCommerce
+        // store. This direct WC call only fires if WooCommerce is present.
+        if (!function_exists('wc_get_order')) {
+            return;
+        }
         $order = wc_get_order($order_id);
         if (!$order) {
             return;
@@ -127,6 +138,12 @@ final class EventTracker
      */
     public function track_refund_requested(int $order_id): void
     {
+        // NOTE: On standalone deployment this value is populated via the
+        // AMS ingest endpoint receiving data from the remote WooCommerce
+        // store. This direct WC call only fires if WooCommerce is present.
+        if (!function_exists('wc_get_order')) {
+            return;
+        }
         $order = wc_get_order($order_id);
         if (!$order) {
             return;
@@ -155,6 +172,9 @@ final class EventTracker
      */
     public function track_viewed_product(): void
     {
+        if (!class_exists('WC_Product')) {
+            return;
+        }
         global $product;
         if (!$product || !is_a($product, 'WC_Product')) {
             return;
@@ -193,7 +213,10 @@ final class EventTracker
             return;
         }
 
-        $product = wc_get_product($product_id);
+        // NOTE: On standalone deployment this value is populated via the
+        // AMS ingest endpoint receiving data from the remote WooCommerce
+        // store. This direct WC call only fires if WooCommerce is present.
+        $product = function_exists('wc_get_product') ? wc_get_product($product_id) : null;
 
         $this->record_event(
             (int) $subscriber->id,
@@ -224,10 +247,13 @@ final class EventTracker
             return;
         }
 
-        $cart = WC()->cart;
-        if (!$cart) {
+        // NOTE: On standalone deployment this value is populated via the
+        // AMS ingest endpoint receiving data from the remote WooCommerce
+        // store. This direct WC call only fires if WooCommerce is present.
+        if (!function_exists('WC') || !WC()->cart) {
             return;
         }
+        $cart = WC()->cart;
 
         $product_ids = [];
         $cart_items = [];
@@ -312,7 +338,7 @@ final class EventTracker
                 wp_send_json_error('Unknown subscriber', 404);
             }
 
-            $product = $product_id > 0 ? wc_get_product($product_id) : null;
+            $product = ($product_id > 0 && function_exists('wc_get_product')) ? wc_get_product($product_id) : null;
 
             $this->record_event(
                 (int) $subscriber->id,
@@ -359,6 +385,13 @@ final class EventTracker
      */
     private function update_subscriber_order_stats(object $subscriber): void
     {
+        // NOTE: On standalone deployment this value is populated via the
+        // AMS ingest endpoint receiving data from the remote WooCommerce
+        // store. This direct WC call only fires if WooCommerce is present.
+        if (!function_exists('wc_get_orders')) {
+            return;
+        }
+
         global $wpdb;
 
         $email = $subscriber->email;

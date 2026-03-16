@@ -23,7 +23,7 @@ final class Menu
      */
     public function register(): void
     {
-        $capability = 'manage_woocommerce';
+        $capability = function_exists('WC') ? 'manage_woocommerce' : 'manage_options';
 
         // Top-level menu.
         add_menu_page(

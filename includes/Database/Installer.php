@@ -314,7 +314,8 @@ final class Installer
 
     private function get_sync_inbound_log_schema(string $prefix, string $charset_collate): string
     {
-        return "CREATE TABLE {$prefix}ams_sync_inbound_log (
+        // Legacy table kept for backwards compatibility.
+        $sql = "CREATE TABLE {$prefix}ams_sync_inbound_log (
             id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
             event_type varchar(50) NOT NULL,
             source_site_url varchar(500) DEFAULT '' NOT NULL,
@@ -326,6 +327,23 @@ final class Installer
             KEY received_at (received_at),
             KEY http_response_sent (http_response_sent)
         ) $charset_collate;\n\n";
+
+        // New sync log table with status column.
+        $sql .= "CREATE TABLE {$prefix}ams_sync_log (
+            id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+            event_type varchar(50) NOT NULL,
+            source_site_url varchar(500) DEFAULT '' NOT NULL,
+            payload_hash varchar(16) DEFAULT '' NOT NULL,
+            http_response_sent smallint(3) unsigned DEFAULT 200 NOT NULL,
+            status varchar(20) DEFAULT 'processed' NOT NULL,
+            received_at datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+            PRIMARY KEY  (id),
+            KEY event_type (event_type),
+            KEY received_at (received_at),
+            KEY status (status)
+        ) $charset_collate;\n\n";
+
+        return $sql;
     }
 
     private function get_flow_enrolments_schema(string $prefix, string $charset_collate): string

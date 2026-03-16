@@ -23,9 +23,14 @@ final class WelcomeSeries extends AbstractTrigger
         // Fires when double opt-in is confirmed.
         add_action('ams_subscriber_confirmed', [$this, 'on_subscriber_confirmed']);
 
-        // Fires on direct subscription (no double opt-in).
-        add_action('woocommerce_checkout_order_processed', [$this, 'on_checkout_subscription'], 30, 3);
+        if (function_exists('WC')) {
+            // Fires on direct subscription (no double opt-in).
+            add_action('woocommerce_checkout_order_processed', [$this, 'on_checkout_subscription'], 30, 3);
+        }
         add_action('user_register', [$this, 'on_registration'], 30, 1);
+
+        // Also listen for the sync trigger from the ingest endpoint.
+        add_action('ams_trigger_welcome_series', [$this, 'on_subscriber_confirmed']);
     }
 
     public function on_subscriber_confirmed(int $subscriber_id): void
@@ -33,8 +38,11 @@ final class WelcomeSeries extends AbstractTrigger
         $this->enrol_subscriber($subscriber_id);
     }
 
-    public function on_checkout_subscription(int $order_id, array $posted_data, \WC_Order $order): void
+    public function on_checkout_subscription(int $order_id, array $posted_data, object $order): void
     {
+        if (!class_exists('WC_Order') || !($order instanceof \WC_Order)) {
+            return;
+        }
         if (\Apotheca\Marketing\Settings::get('gdpr_double_optin')) {
             return; // Will be handled by on_subscriber_confirmed.
         }

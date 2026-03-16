@@ -66,7 +66,7 @@ $total_pages = (int) ceil($total / 20);
                     </td>
                     <td><?php echo esc_html(ucfirst($sub->source)); ?></td>
                     <td><?php echo esc_html((string) $sub->total_orders); ?></td>
-                    <td><?php echo esc_html(wc_price((float) $sub->total_spent)); ?></td>
+                    <td><?php echo esc_html(function_exists('wc_price') ? wc_price((float) $sub->total_spent) : '$' . number_format((float) $sub->total_spent, 2)); ?></td>
                     <td><?php echo esc_html($sub->rfm_segment ?: '—'); ?></td>
                     <td><?php echo $sub->subscribed_at ? esc_html(wp_date(get_option('date_format'), strtotime($sub->subscribed_at))) : '—'; ?></td>
                 </tr>

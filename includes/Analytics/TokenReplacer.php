@@ -57,11 +57,11 @@ final class TokenReplacer
 
         // Order tokens.
         $order = $context['order'] ?? null;
-        if ($order instanceof \WC_Order) {
+        if (class_exists('WC_Order') && $order instanceof \WC_Order) {
             $tokens['{{order_number}}']      = (string) $order->get_order_number();
             $tokens['{{order_date}}']        = $order->get_date_created() ? $order->get_date_created()->date('F j, Y') : '';
             $tokens['{{order_total}}']       = $order->get_formatted_order_total();
-            $tokens['{{order_status}}']      = wc_get_order_status_name($order->get_status());
+            $tokens['{{order_status}}']      = function_exists('wc_get_order_status_name') ? wc_get_order_status_name($order->get_status()) : $order->get_status();
             $tokens['{{order_items_table}}'] = self::build_order_items_table($order);
             $tokens['{{shipping_address}}']  = $order->get_formatted_shipping_address() ?: '';
             $tokens['{{billing_address}}']   = $order->get_formatted_billing_address() ?: '';
@@ -83,6 +83,9 @@ final class TokenReplacer
         }
 
         // Cart tokens.
+        // NOTE: On standalone deployment this value is populated via the
+        // AMS ingest endpoint receiving data from the remote WooCommerce
+        // store. This direct WC call only fires if WooCommerce is present.
         $tokens['{{cart_url}}']        = $context['cart_url'] ?? (function_exists('wc_get_cart_url') ? wc_get_cart_url() : '');
         $tokens['{{cart_items_table}}'] = $context['cart_items_table'] ?? '';
         $tokens['{{cart_total}}']      = $context['cart_total'] ?? '';
@@ -121,7 +124,7 @@ final class TokenReplacer
         $review_gate_url = '';
         if (!empty($subscriber->unsubscribe_token)) {
             $order_id = 0;
-            if ($order instanceof \WC_Order) {
+            if (class_exists('WC_Order') && $order instanceof \WC_Order) {
                 $order_id = $order->get_id();
             } elseif (!empty($context['order_id'])) {
                 $order_id = (int) $context['order_id'];
@@ -135,7 +138,7 @@ final class TokenReplacer
 
         // Review URL — direct product review link (first product from order).
         $review_url = $context['review_url'] ?? '';
-        if (!$review_url && $order instanceof \WC_Order) {
+        if (!$review_url && class_exists('WC_Order') && $order instanceof \WC_Order) {
             $items = $order->get_items();
             $first_item = reset($items);
             if ($first_item) {
@@ -209,8 +212,11 @@ final class TokenReplacer
     /**
      * Build an HTML table of order items for email.
      */
-    private static function build_order_items_table(\WC_Order $order): string
+    private static function build_order_items_table(object $order): string
     {
+        if (!class_exists('WC_Order') || !($order instanceof \WC_Order)) {
+            return '';
+        }
         $rows = '';
         foreach ($order->get_items() as $item) {
             $product = $item->get_product();
@@ -220,7 +226,7 @@ final class TokenReplacer
                 $rows .= '<td style="padding:8px;"><img src="' . esc_url($image_url) . '" width="60" height="60" alt="" style="display:block;" /></td>';
             }
             $rows .= '<td style="padding:8px;">' . esc_html($item->get_name()) . ' &times; ' . esc_html((string) $item->get_quantity()) . '</td>';
-            $rows .= '<td style="padding:8px;text-align:right;">' . wc_price((float) $item->get_total()) . '</td>';
+            $rows .= '<td style="padding:8px;text-align:right;">' . (function_exists('wc_price') ? wc_price((float) $item->get_total()) : '$' . number_format((float) $item->get_total(), 2)) . '</td>';
             $rows .= '</tr>';
         }
 

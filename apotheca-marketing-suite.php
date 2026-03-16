@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Apotheca® Marketing Suite
  * Plugin URI:  https://apothecamarketing.com
- * Description: Premium WooCommerce email and SMS marketing automation suite with flows, segmentation, RFM scoring, pop-up forms, and analytics.
+ * Description: Premium email and SMS marketing automation suite with flows, segmentation, RFM scoring, pop-up forms, and analytics.
  * Version:     1.0.0
  * Author:      Apotheca®
  * Author URI:  https://apothecamarketing.com
@@ -59,15 +59,6 @@ spl_autoload_register(function (string $class): void {
  * Activation hook — create DB tables and set default options.
  */
 register_activation_hook(__FILE__, function (): void {
-    if (!class_exists('WooCommerce')) {
-        deactivate_plugins(AMS_PLUGIN_BASENAME);
-        wp_die(
-            esc_html__('Apotheca® Marketing Suite requires WooCommerce to be installed and active.', 'apotheca-marketing-suite'),
-            'Plugin dependency check',
-            ['back_link' => true]
-        );
-    }
-
     $installer = new Database\Installer();
     $installer->install();
 
@@ -132,15 +123,16 @@ final class Plugin
     }
 
     /**
-     * Verify WooCommerce is active before initialising.
+     * Show standalone mode notice when sync is not configured.
      */
     private function check_dependencies(): void
     {
         add_action('admin_init', function (): void {
-            if (!class_exists('WooCommerce')) {
+            $store_url = Settings::get('store_url', '');
+            if (empty($store_url) && !class_exists('WooCommerce')) {
                 add_action('admin_notices', function (): void {
-                    echo '<div class="notice notice-error"><p>';
-                    echo esc_html__('Apotheca® Marketing Suite requires WooCommerce to be installed and active.', 'apotheca-marketing-suite');
+                    echo '<div class="notice notice-info"><p>';
+                    echo esc_html__('Apotheca® Marketing Suite is running in standalone mode. To receive customer and order data from your WooCommerce store, enter your store URL and shared secret in Settings > Sync.', 'apotheca-marketing-suite');
                     echo '</p></div>';
                 });
             }
@@ -183,8 +175,12 @@ final class Plugin
      */
     public function init_components(): void
     {
-        if (!class_exists('WooCommerce')) {
-            return;
+        // Load bundled Action Scheduler if WooCommerce is not providing it.
+        if (!class_exists('ActionScheduler')) {
+            $as_path = plugin_dir_path(AMS_PLUGIN_FILE) . 'lib/action-scheduler/action-scheduler.php';
+            if (file_exists($as_path)) {
+                require_once $as_path;
+            }
         }
 
         // Admin menu and assets.

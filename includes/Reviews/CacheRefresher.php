@@ -53,9 +53,11 @@ final class CacheRefresher
         // 1. Purge stale entries older than 48 hours.
         $this->purge_stale();
 
-        // 2. Import WooCommerce native reviews.
-        $wc_importer = new WooCommerceImporter();
-        $wc_importer->import(200);
+        // 2. Import WooCommerce native reviews (only if WC is present).
+        if (function_exists('WC')) {
+            $wc_importer = new WooCommerceImporter();
+            $wc_importer->import(200);
+        }
 
         // 3. Import Judge.me reviews (if available).
         $judgeme_importer = new JudgeMeImporter();

@@ -145,6 +145,9 @@ final class ReviewSelector
         $top_category_id = (int) array_key_first($category_counts);
 
         // Get product IDs in that category.
+        if (!function_exists('wc_get_products')) {
+            return [];
+        }
         $product_ids = wc_get_products([
             'status'   => 'publish',
             'category' => [get_term($top_category_id)->slug ?? ''],
