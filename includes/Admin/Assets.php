@@ -38,6 +38,30 @@ final class Assets
         if (str_contains($screen->id, 'ams-segments')) {
             $this->enqueue_segment_builder();
         }
+
+        // Form builder — only on the Forms page.
+        if (str_contains($screen->id, 'ams-forms')) {
+            $this->enqueue_form_builder();
+        }
+    }
+
+    /**
+     * Enqueue the React form builder bundle.
+     */
+    private function enqueue_form_builder(): void
+    {
+        wp_enqueue_script(
+            'ams-form-builder',
+            AMS_PLUGIN_URL . 'assets/js/form-builder.js',
+            ['wp-element', 'wp-api-fetch'],
+            AMS_VERSION,
+            true
+        );
+
+        wp_localize_script('ams-form-builder', 'amsFormBuilder', [
+            'restUrl' => rest_url('ams/v1/'),
+            'nonce'   => wp_create_nonce('wp_rest'),
+        ]);
     }
 
     /**

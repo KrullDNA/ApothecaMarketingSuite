@@ -211,6 +211,8 @@ final class Installer
             targeting_config longtext DEFAULT NULL,
             fields longtext DEFAULT NULL,
             design_config longtext DEFAULT NULL,
+            success_config longtext DEFAULT NULL,
+            spin_config longtext DEFAULT NULL,
             status varchar(20) DEFAULT 'draft' NOT NULL,
             views int(10) unsigned DEFAULT 0 NOT NULL,
             submissions int(10) unsigned DEFAULT 0 NOT NULL,

@@ -32,7 +32,7 @@ define('AMS_PLUGIN_FILE', __FILE__);
 define('AMS_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('AMS_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('AMS_PLUGIN_BASENAME', plugin_basename(__FILE__));
-define('AMS_DB_VERSION', '1.1.0');
+define('AMS_DB_VERSION', '1.2.0');
 define('AMS_SETTINGS_KEY', 'ams_settings');
 
 /**
@@ -203,6 +203,10 @@ final class Plugin
         // REST API controllers.
         new API\FlowsController();
         new API\SegmentsController();
+        new API\FormsController();
+
+        // Front-end form loader (conditional enqueue + shortcode).
+        new Forms\FormLoader();
 
         // Segmentation engine — background recalculation.
         new Segments\SegmentCalculator();
