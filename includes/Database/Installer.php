@@ -36,6 +36,8 @@ final class Installer
         $sql .= $this->get_sends_schema($prefix, $charset_collate);
         $sql .= $this->get_forms_schema($prefix, $charset_collate);
         $sql .= $this->get_flow_enrolments_schema($prefix, $charset_collate);
+        $sql .= $this->get_attributions_schema($prefix, $charset_collate);
+        $sql .= $this->get_analytics_daily_schema($prefix, $charset_collate);
 
         dbDelta($sql);
     }
@@ -223,6 +225,42 @@ final class Installer
             PRIMARY KEY  (id),
             KEY status (status),
             KEY type (type)
+        ) $charset_collate;\n\n";
+    }
+
+    private function get_attributions_schema(string $prefix, string $charset_collate): string
+    {
+        return "CREATE TABLE {$prefix}ams_attributions (
+            id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+            send_id bigint(20) unsigned NOT NULL,
+            campaign_id bigint(20) unsigned DEFAULT NULL,
+            flow_id bigint(20) unsigned DEFAULT NULL,
+            flow_step_id bigint(20) unsigned DEFAULT NULL,
+            subscriber_id bigint(20) unsigned NOT NULL,
+            order_id bigint(20) unsigned NOT NULL,
+            order_total decimal(12,2) DEFAULT 0.00 NOT NULL,
+            attributed_at datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+            PRIMARY KEY  (id),
+            KEY send_id (send_id),
+            KEY campaign_id (campaign_id),
+            KEY flow_id (flow_id),
+            KEY subscriber_id (subscriber_id),
+            KEY order_id (order_id),
+            KEY attributed_at (attributed_at)
+        ) $charset_collate;\n\n";
+    }
+
+    private function get_analytics_daily_schema(string $prefix, string $charset_collate): string
+    {
+        return "CREATE TABLE {$prefix}ams_analytics_daily (
+            id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+            date date NOT NULL,
+            metric_key varchar(100) NOT NULL,
+            metric_value decimal(14,2) DEFAULT 0.00 NOT NULL,
+            PRIMARY KEY  (id),
+            UNIQUE KEY date_metric (date, metric_key),
+            KEY metric_key (metric_key),
+            KEY date (date)
         ) $charset_collate;\n\n";
     }
 

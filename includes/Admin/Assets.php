@@ -48,6 +48,11 @@ final class Assets
         if (str_contains($screen->id, 'ams-sms')) {
             $this->enqueue_sms_campaign();
         }
+
+        // Analytics dashboard — only on the Analytics page.
+        if (str_contains($screen->id, 'ams-analytics')) {
+            $this->enqueue_analytics_dashboard();
+        }
     }
 
     /**
@@ -102,6 +107,25 @@ final class Assets
         );
 
         wp_localize_script('ams-segment-builder', 'amsSegmentBuilder', [
+            'restUrl' => rest_url('ams/v1/'),
+            'nonce'   => wp_create_nonce('wp_rest'),
+        ]);
+    }
+
+    /**
+     * Enqueue the React analytics dashboard bundle.
+     */
+    private function enqueue_analytics_dashboard(): void
+    {
+        wp_enqueue_script(
+            'ams-analytics-dashboard',
+            AMS_PLUGIN_URL . 'assets/js/analytics-dashboard.js',
+            ['wp-element', 'wp-api-fetch'],
+            AMS_VERSION,
+            true
+        );
+
+        wp_localize_script('ams-analytics-dashboard', 'amsAnalytics', [
             'restUrl' => rest_url('ams/v1/'),
             'nonce'   => wp_create_nonce('wp_rest'),
         ]);

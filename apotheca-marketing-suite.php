@@ -32,7 +32,7 @@ define('AMS_PLUGIN_FILE', __FILE__);
 define('AMS_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('AMS_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('AMS_PLUGIN_BASENAME', plugin_basename(__FILE__));
-define('AMS_DB_VERSION', '1.3.0');
+define('AMS_DB_VERSION', '1.4.0');
 define('AMS_SETTINGS_KEY', 'ams_settings');
 
 /**
@@ -95,6 +95,7 @@ register_deactivation_hook(__FILE__, function (): void {
         as_unschedule_all_actions('ams_predictive_nightly');
         as_unschedule_all_actions('ams_send_sms_async');
         as_unschedule_all_actions('ams_send_sms_retry');
+        as_unschedule_all_actions('ams_analytics_aggregate');
     }
 
     flush_rewrite_rules();
@@ -217,9 +218,16 @@ final class Plugin
         // Segmentation engine — background recalculation.
         new Segments\SegmentCalculator();
 
-        // Analytics engines — nightly RFM and predictive scoring.
+        // Analytics engines — nightly RFM, predictive scoring, and aggregation.
         new Analytics\RfmEngine();
         new Analytics\PredictiveEngine();
+        new Analytics\AnalyticsAggregator();
+
+        // Revenue attribution (last-click model).
+        new Analytics\RevenueAttributor();
+
+        // Analytics dashboard REST API.
+        new API\AnalyticsController();
     }
 
     /**
