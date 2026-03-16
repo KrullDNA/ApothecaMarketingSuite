@@ -49,4 +49,5 @@ if (function_exists('as_unschedule_all_actions')) {
     as_unschedule_all_actions('ams_flow_win_back_check');
     as_unschedule_all_actions('ams_flow_browse_abandon_check');
     as_unschedule_all_actions('ams_flow_birthday_check');
+    as_unschedule_all_actions('ams_predictive_nightly');
 }

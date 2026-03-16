@@ -33,6 +33,30 @@ final class Assets
         if (str_contains($screen->id, 'ams-flows')) {
             $this->enqueue_flow_builder();
         }
+
+        // Segment builder — only on the Segments page.
+        if (str_contains($screen->id, 'ams-segments')) {
+            $this->enqueue_segment_builder();
+        }
+    }
+
+    /**
+     * Enqueue the React segment builder bundle.
+     */
+    private function enqueue_segment_builder(): void
+    {
+        wp_enqueue_script(
+            'ams-segment-builder',
+            AMS_PLUGIN_URL . 'assets/js/segment-builder.js',
+            ['wp-element', 'wp-api-fetch'],
+            AMS_VERSION,
+            true
+        );
+
+        wp_localize_script('ams-segment-builder', 'amsSegmentBuilder', [
+            'restUrl' => rest_url('ams/v1/'),
+            'nonce'   => wp_create_nonce('wp_rest'),
+        ]);
     }
 
     /**

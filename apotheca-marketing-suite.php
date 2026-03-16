@@ -92,6 +92,7 @@ register_deactivation_hook(__FILE__, function (): void {
         as_unschedule_all_actions('ams_flow_win_back_check');
         as_unschedule_all_actions('ams_flow_browse_abandon_check');
         as_unschedule_all_actions('ams_flow_birthday_check');
+        as_unschedule_all_actions('ams_predictive_nightly');
     }
 
     flush_rewrite_rules();
@@ -201,6 +202,14 @@ final class Plugin
 
         // REST API controllers.
         new API\FlowsController();
+        new API\SegmentsController();
+
+        // Segmentation engine — background recalculation.
+        new Segments\SegmentCalculator();
+
+        // Analytics engines — nightly RFM and predictive scoring.
+        new Analytics\RfmEngine();
+        new Analytics\PredictiveEngine();
     }
 
     /**
