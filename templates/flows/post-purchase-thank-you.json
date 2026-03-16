@@ -1,0 +1,44 @@
+{
+    "name": "Post-Purchase Thank You",
+    "description": "2-step flow: immediate thank-you email, day 7 review request.",
+    "trigger_type": "post_purchase",
+    "trigger_config": {},
+    "steps": [
+        {
+            "step_type": "send_email",
+            "step_order": 0,
+            "delay_value": 0,
+            "delay_unit": "minutes",
+            "subject": "Thank you for your order, {{first_name}}!",
+            "preview_text": "We appreciate your business.",
+            "body_html": "<h1>Thank You!</h1><p>Hi {{first_name}},</p><p>Thank you for shopping with {{site_name}}. We truly appreciate your business and hope you love your purchase.</p><p>If you have any questions about your order, don't hesitate to reach out to our support team.</p><p><a href=\"{{site_url}}\">Continue Shopping</a></p>",
+            "body_text": "Hi {{first_name}}, thank you for your order at {{site_name}}. We hope you love your purchase. Continue shopping at {{site_url}}.",
+            "sms_body": "",
+            "conditions": []
+        },
+        {
+            "step_type": "wait",
+            "step_order": 1,
+            "delay_value": 7,
+            "delay_unit": "days",
+            "subject": "",
+            "preview_text": "",
+            "body_html": "",
+            "body_text": "",
+            "sms_body": "",
+            "conditions": []
+        },
+        {
+            "step_type": "send_email",
+            "step_order": 2,
+            "delay_value": 0,
+            "delay_unit": "minutes",
+            "subject": "How was your experience, {{first_name}}?",
+            "preview_text": "We'd love to hear your thoughts.",
+            "body_html": "<h1>Share Your Experience</h1><p>Hi {{first_name}},</p><p>It's been a week since your order arrived — we'd love to hear what you think!</p><p>Your review helps other customers make confident decisions and helps us continue improving.</p><p><a href=\"{{site_url}}\">Leave a Review</a></p><p>Thank you for being a valued customer.</p>",
+            "body_text": "Hi {{first_name}}, how was your recent purchase? We'd love your feedback. Leave a review at {{site_url}}.",
+            "sms_body": "",
+            "conditions": []
+        }
+    ]
+}

@@ -1,0 +1,80 @@
+{
+    "name": "Abandoned Cart Recovery",
+    "description": "3-step recovery: 1hr email, 24hr email with social proof, 48hr email with discount.",
+    "trigger_type": "abandoned_cart",
+    "trigger_config": {},
+    "steps": [
+        {
+            "step_type": "wait",
+            "step_order": 0,
+            "delay_value": 1,
+            "delay_unit": "hours",
+            "subject": "",
+            "preview_text": "",
+            "body_html": "",
+            "body_text": "",
+            "sms_body": "",
+            "conditions": []
+        },
+        {
+            "step_type": "send_email",
+            "step_order": 1,
+            "delay_value": 0,
+            "delay_unit": "minutes",
+            "subject": "You left something behind, {{first_name}}",
+            "preview_text": "Your cart is waiting for you.",
+            "body_html": "<h1>Forgot Something?</h1><p>Hi {{first_name}},</p><p>It looks like you left some items in your cart. Don't worry — we saved them for you.</p><p><a href=\"{{site_url}}cart/\">Complete Your Order</a></p>",
+            "body_text": "Hi {{first_name}}, you left items in your cart. Complete your order at {{site_url}}cart/.",
+            "sms_body": "",
+            "conditions": []
+        },
+        {
+            "step_type": "wait",
+            "step_order": 2,
+            "delay_value": 23,
+            "delay_unit": "hours",
+            "subject": "",
+            "preview_text": "",
+            "body_html": "",
+            "body_text": "",
+            "sms_body": "",
+            "conditions": []
+        },
+        {
+            "step_type": "send_email",
+            "step_order": 3,
+            "delay_value": 0,
+            "delay_unit": "minutes",
+            "subject": "People are loving these products",
+            "preview_text": "See why others chose the same items.",
+            "body_html": "<h1>Still Thinking It Over?</h1><p>Hi {{first_name}},</p><p>The items in your cart are popular choices. Our customers love them — and we think you will too.</p><p>Don't miss out before they sell out!</p><p><a href=\"{{site_url}}cart/\">Return to Your Cart</a></p>",
+            "body_text": "Hi {{first_name}}, your cart items are popular picks. Complete your order before they sell out: {{site_url}}cart/.",
+            "sms_body": "",
+            "conditions": []
+        },
+        {
+            "step_type": "wait",
+            "step_order": 4,
+            "delay_value": 24,
+            "delay_unit": "hours",
+            "subject": "",
+            "preview_text": "",
+            "body_html": "",
+            "body_text": "",
+            "sms_body": "",
+            "conditions": []
+        },
+        {
+            "step_type": "send_email",
+            "step_order": 5,
+            "delay_value": 0,
+            "delay_unit": "minutes",
+            "subject": "Last chance — 10% off your cart",
+            "preview_text": "A special discount to help you decide.",
+            "body_html": "<h1>Final Reminder</h1><p>Hi {{first_name}},</p><p>We really want you to have these items! Here's a special 10% discount to seal the deal.</p><p><strong>Use code: CART10</strong></p><p><a href=\"{{site_url}}cart/\">Complete Your Order</a></p><p>This code expires in 24 hours.</p>",
+            "body_text": "Hi {{first_name}}, here's 10% off your cart. Use code CART10 at {{site_url}}cart/. Expires in 24 hours.",
+            "sms_body": "",
+            "conditions": []
+        }
+    ]
+}

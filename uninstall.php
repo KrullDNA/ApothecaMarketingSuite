@@ -29,6 +29,7 @@ $tables = [
     $wpdb->prefix . 'ams_segments',
     $wpdb->prefix . 'ams_sends',
     $wpdb->prefix . 'ams_forms',
+    $wpdb->prefix . 'ams_flow_enrolments',
 ];
 
 foreach ($tables as $table) {
@@ -44,4 +45,8 @@ if (function_exists('as_unschedule_all_actions')) {
     as_unschedule_all_actions('ams_abandoned_cart_check');
     as_unschedule_all_actions('ams_rfm_nightly');
     as_unschedule_all_actions('ams_segment_recalculate');
+    as_unschedule_all_actions('ams_flow_process_step');
+    as_unschedule_all_actions('ams_flow_win_back_check');
+    as_unschedule_all_actions('ams_flow_browse_abandon_check');
+    as_unschedule_all_actions('ams_flow_birthday_check');
 }

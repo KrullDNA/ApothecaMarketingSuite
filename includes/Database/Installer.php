@@ -35,6 +35,7 @@ final class Installer
         $sql .= $this->get_segments_schema($prefix, $charset_collate);
         $sql .= $this->get_sends_schema($prefix, $charset_collate);
         $sql .= $this->get_forms_schema($prefix, $charset_collate);
+        $sql .= $this->get_flow_enrolments_schema($prefix, $charset_collate);
 
         dbDelta($sql);
     }
@@ -218,6 +219,27 @@ final class Installer
             PRIMARY KEY  (id),
             KEY status (status),
             KEY type (type)
+        ) $charset_collate;\n\n";
+    }
+
+    private function get_flow_enrolments_schema(string $prefix, string $charset_collate): string
+    {
+        return "CREATE TABLE {$prefix}ams_flow_enrolments (
+            id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+            flow_id bigint(20) unsigned NOT NULL,
+            subscriber_id bigint(20) unsigned NOT NULL,
+            current_step_id bigint(20) unsigned DEFAULT NULL,
+            status varchar(20) DEFAULT 'active' NOT NULL,
+            enrolled_at datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+            completed_at datetime DEFAULT NULL,
+            exited_at datetime DEFAULT NULL,
+            exit_reason varchar(100) DEFAULT '' NOT NULL,
+            PRIMARY KEY  (id),
+            KEY flow_id (flow_id),
+            KEY subscriber_id (subscriber_id),
+            KEY status (status),
+            KEY flow_subscriber (flow_id, subscriber_id, status),
+            KEY current_step_id (current_step_id)
         ) $charset_collate;\n\n";
     }
 }

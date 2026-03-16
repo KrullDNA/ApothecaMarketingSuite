@@ -1,0 +1,138 @@
+{
+    "name": "Welcome Series",
+    "description": "5-step welcome flow: immediate email, day 2, day 5, day 7 with discount, day 10 SMS if no purchase.",
+    "trigger_type": "welcome_series",
+    "trigger_config": {},
+    "steps": [
+        {
+            "step_type": "send_email",
+            "step_order": 0,
+            "delay_value": 0,
+            "delay_unit": "minutes",
+            "subject": "Welcome to {{site_name}}, {{first_name}}!",
+            "preview_text": "We're glad you're here.",
+            "body_html": "<h1>Welcome, {{first_name}}!</h1><p>Thank you for joining {{site_name}}. We're excited to have you as part of our community.</p><p>Browse our latest products and find something you'll love.</p><p><a href=\"{{site_url}}\">Shop Now</a></p>",
+            "body_text": "Welcome, {{first_name}}! Thank you for joining {{site_name}}. Browse our latest products at {{site_url}}.",
+            "sms_body": "",
+            "conditions": []
+        },
+        {
+            "step_type": "wait",
+            "step_order": 1,
+            "delay_value": 2,
+            "delay_unit": "days",
+            "subject": "",
+            "preview_text": "",
+            "body_html": "",
+            "body_text": "",
+            "sms_body": "",
+            "conditions": []
+        },
+        {
+            "step_type": "send_email",
+            "step_order": 2,
+            "delay_value": 0,
+            "delay_unit": "minutes",
+            "subject": "Our Story — Why We Do What We Do",
+            "preview_text": "Get to know us a little better.",
+            "body_html": "<h1>Our Story</h1><p>Hi {{first_name}},</p><p>We wanted to share a little about who we are and why we started {{site_name}}.</p><p>Every product we carry is carefully curated to meet the highest standards. We believe in quality, transparency, and putting our customers first.</p><p><a href=\"{{site_url}}\">Explore Our Collections</a></p>",
+            "body_text": "Hi {{first_name}}, we wanted to share a little about who we are. Visit {{site_url}} to explore our collections.",
+            "sms_body": "",
+            "conditions": []
+        },
+        {
+            "step_type": "wait",
+            "step_order": 3,
+            "delay_value": 3,
+            "delay_unit": "days",
+            "subject": "",
+            "preview_text": "",
+            "body_html": "",
+            "body_text": "",
+            "sms_body": "",
+            "conditions": []
+        },
+        {
+            "step_type": "send_email",
+            "step_order": 4,
+            "delay_value": 0,
+            "delay_unit": "minutes",
+            "subject": "Our Customers' Favourites",
+            "preview_text": "See what everyone is loving right now.",
+            "body_html": "<h1>Trending Now</h1><p>Hi {{first_name}},</p><p>Here are some of our most popular products that our customers can't stop raving about.</p><p><a href=\"{{site_url}}\">See What's Trending</a></p>",
+            "body_text": "Hi {{first_name}}, check out our most popular products at {{site_url}}.",
+            "sms_body": "",
+            "conditions": []
+        },
+        {
+            "step_type": "wait",
+            "step_order": 5,
+            "delay_value": 2,
+            "delay_unit": "days",
+            "subject": "",
+            "preview_text": "",
+            "body_html": "",
+            "body_text": "",
+            "sms_body": "",
+            "conditions": []
+        },
+        {
+            "step_type": "send_email",
+            "step_order": 6,
+            "delay_value": 0,
+            "delay_unit": "minutes",
+            "subject": "A Special Treat Just for You — Save 10%",
+            "preview_text": "Your exclusive welcome discount inside.",
+            "body_html": "<h1>Your Welcome Gift</h1><p>Hi {{first_name}},</p><p>As a thank you for joining us, here's an exclusive 10% discount on your first order.</p><p><strong>Use code: WELCOME10</strong></p><p><a href=\"{{site_url}}\">Shop Now & Save</a></p><p>This offer is valid for the next 7 days.</p>",
+            "body_text": "Hi {{first_name}}, here's 10% off your first order. Use code WELCOME10 at {{site_url}}. Valid 7 days.",
+            "sms_body": "",
+            "conditions": []
+        },
+        {
+            "step_type": "wait",
+            "step_order": 7,
+            "delay_value": 3,
+            "delay_unit": "days",
+            "subject": "",
+            "preview_text": "",
+            "body_html": "",
+            "body_text": "",
+            "sms_body": "",
+            "conditions": []
+        },
+        {
+            "step_type": "condition",
+            "step_order": 8,
+            "delay_value": 0,
+            "delay_unit": "minutes",
+            "subject": "",
+            "preview_text": "",
+            "body_html": "",
+            "body_text": "",
+            "sms_body": "",
+            "conditions": {
+                "rules": [
+                    {
+                        "field": "total_orders",
+                        "operator": "equals",
+                        "value": "0"
+                    }
+                ],
+                "yes_step_id": null,
+                "no_step_id": null
+            }
+        },
+        {
+            "step_type": "send_sms",
+            "step_order": 9,
+            "delay_value": 0,
+            "delay_unit": "minutes",
+            "subject": "",
+            "preview_text": "",
+            "body_html": "",
+            "body_text": "",
+            "sms_body": "Hi {{first_name}}, don't forget about your 10% welcome discount at {{site_name}}! Use code WELCOME10 before it expires.",
+            "conditions": []
+        }
+    ]
+}

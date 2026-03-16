@@ -32,7 +32,7 @@ define('AMS_PLUGIN_FILE', __FILE__);
 define('AMS_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('AMS_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('AMS_PLUGIN_BASENAME', plugin_basename(__FILE__));
-define('AMS_DB_VERSION', '1.0.0');
+define('AMS_DB_VERSION', '1.1.0');
 define('AMS_SETTINGS_KEY', 'ams_settings');
 
 /**
@@ -88,6 +88,10 @@ register_deactivation_hook(__FILE__, function (): void {
         as_unschedule_all_actions('ams_abandoned_cart_check');
         as_unschedule_all_actions('ams_rfm_nightly');
         as_unschedule_all_actions('ams_segment_recalculate');
+        as_unschedule_all_actions('ams_flow_process_step');
+        as_unschedule_all_actions('ams_flow_win_back_check');
+        as_unschedule_all_actions('ams_flow_browse_abandon_check');
+        as_unschedule_all_actions('ams_flow_birthday_check');
     }
 
     flush_rewrite_rules();
@@ -174,9 +178,10 @@ final class Plugin
             return;
         }
 
-        // Admin menu.
+        // Admin menu and assets.
         if (is_admin()) {
             new Admin\Menu();
+            new Admin\Assets();
         }
 
         // Subscriber capture hooks.
@@ -190,6 +195,12 @@ final class Plugin
 
         // GDPR and unsubscribe handling.
         new GDPR\Handler();
+
+        // Flow engine — triggers, execution, and scheduling.
+        new Flows\FlowManager();
+
+        // REST API controllers.
+        new API\FlowsController();
     }
 
     /**

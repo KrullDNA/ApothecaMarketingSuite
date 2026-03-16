@@ -1,0 +1,56 @@
+{
+    "name": "Browse Abandonment",
+    "description": "2-step flow: 30min email reminder, 24hr follow-up email.",
+    "trigger_type": "browse_abandonment",
+    "trigger_config": {},
+    "steps": [
+        {
+            "step_type": "wait",
+            "step_order": 0,
+            "delay_value": 30,
+            "delay_unit": "minutes",
+            "subject": "",
+            "preview_text": "",
+            "body_html": "",
+            "body_text": "",
+            "sms_body": "",
+            "conditions": []
+        },
+        {
+            "step_type": "send_email",
+            "step_order": 1,
+            "delay_value": 0,
+            "delay_unit": "minutes",
+            "subject": "Still looking, {{first_name}}?",
+            "preview_text": "We noticed you were browsing.",
+            "body_html": "<h1>Caught Your Eye?</h1><p>Hi {{first_name}},</p><p>We noticed you were checking out some of our products. Still interested? Here's a quick link back to pick up where you left off.</p><p><a href=\"{{site_url}}\">Continue Browsing</a></p>",
+            "body_text": "Hi {{first_name}}, still interested in what you were browsing? Continue shopping at {{site_url}}.",
+            "sms_body": "",
+            "conditions": []
+        },
+        {
+            "step_type": "wait",
+            "step_order": 2,
+            "delay_value": 24,
+            "delay_unit": "hours",
+            "subject": "",
+            "preview_text": "",
+            "body_html": "",
+            "body_text": "",
+            "sms_body": "",
+            "conditions": []
+        },
+        {
+            "step_type": "send_email",
+            "step_order": 3,
+            "delay_value": 0,
+            "delay_unit": "minutes",
+            "subject": "These might be just what you're looking for",
+            "preview_text": "Curated picks based on your browsing.",
+            "body_html": "<h1>Picked for You</h1><p>Hi {{first_name}},</p><p>Based on what you were browsing, we think you might like these popular picks from our collection.</p><p><a href=\"{{site_url}}\">Explore Our Bestsellers</a></p><p>Happy shopping!</p>",
+            "body_text": "Hi {{first_name}}, based on your browsing, check out our bestsellers at {{site_url}}.",
+            "sms_body": "",
+            "conditions": []
+        }
+    ]
+}
