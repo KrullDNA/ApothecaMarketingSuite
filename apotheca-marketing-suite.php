@@ -32,7 +32,7 @@ define('AMS_PLUGIN_FILE', __FILE__);
 define('AMS_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('AMS_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('AMS_PLUGIN_BASENAME', plugin_basename(__FILE__));
-define('AMS_DB_VERSION', '1.2.0');
+define('AMS_DB_VERSION', '1.3.0');
 define('AMS_SETTINGS_KEY', 'ams_settings');
 
 /**
@@ -93,6 +93,8 @@ register_deactivation_hook(__FILE__, function (): void {
         as_unschedule_all_actions('ams_flow_browse_abandon_check');
         as_unschedule_all_actions('ams_flow_birthday_check');
         as_unschedule_all_actions('ams_predictive_nightly');
+        as_unschedule_all_actions('ams_send_sms_async');
+        as_unschedule_all_actions('ams_send_sms_retry');
     }
 
     flush_rewrite_rules();
@@ -204,6 +206,10 @@ final class Plugin
         new API\FlowsController();
         new API\SegmentsController();
         new API\FormsController();
+        new API\SmsController();
+
+        // SMS send queue (Action Scheduler hooks).
+        new Sms\SmsSender();
 
         // Front-end form loader (conditional enqueue + shortcode).
         new Forms\FormLoader();

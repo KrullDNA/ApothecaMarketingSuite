@@ -64,6 +64,7 @@ final class Installer
             total_orders int(10) unsigned DEFAULT 0 NOT NULL,
             total_spent decimal(12,2) DEFAULT 0.00 NOT NULL,
             last_order_date datetime DEFAULT NULL,
+            sms_opt_in tinyint(1) DEFAULT 0 NOT NULL,
             unsubscribe_token varchar(64) DEFAULT '' NOT NULL,
             created_at datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
             updated_at datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -74,7 +75,8 @@ final class Installer
             KEY churn_risk_score (churn_risk_score),
             KEY source (source),
             KEY unsubscribe_token (unsubscribe_token),
-            KEY last_order_date (last_order_date)
+            KEY last_order_date (last_order_date),
+            KEY sms_opt_in (sms_opt_in)
         ) $charset_collate;\n\n";
     }
 

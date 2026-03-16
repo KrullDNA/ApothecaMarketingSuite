@@ -2,7 +2,8 @@
 /**
  * Send SMS flow step processor.
  *
- * Queues SMS via Twilio REST API (async via Action Scheduler).
+ * Queues SMS via SmsSender (async via Action Scheduler).
+ * Respects sms_opt_in flag — silently skips if not opted in.
  *
  * @package Apotheca\Marketing\Flows\Steps
  */
@@ -11,7 +12,7 @@ declare(strict_types=1);
 
 namespace Apotheca\Marketing\Flows\Steps;
 
-use Apotheca\Marketing\Settings;
+use Apotheca\Marketing\Sms\SmsSender;
 
 defined('ABSPATH') || exit;
 
@@ -19,52 +20,35 @@ final class SendSms implements StepProcessorInterface
 {
     public function process(object $subscriber, object $step, object $enrolment): mixed
     {
+        // Check phone, status, and SMS opt-in.
         if (empty($subscriber->phone) || $subscriber->status === 'unsubscribed') {
             return false;
         }
 
-        $body = $this->replace_tokens($step->sms_body ?? '', $subscriber);
+        if (empty($subscriber->sms_opt_in)) {
+            return false;
+        }
+
+        $body = SmsSender::replace_tokens($step->sms_body ?? '', $subscriber);
 
         // Append STOP instructions for TCPA compliance.
         $body .= "\n\nReply STOP to unsubscribe.";
 
-        // Schedule async send via Action Scheduler.
-        if (function_exists('as_schedule_single_action')) {
-            as_schedule_single_action(
-                time(),
-                'ams_send_sms_async',
-                [
-                    'phone'         => $subscriber->phone,
-                    'body'          => $body,
-                    'subscriber_id' => (int) $subscriber->id,
-                    'flow_step_id'  => (int) $step->id,
-                ],
-                'ams'
-            );
-        }
+        // Extract MMS media URL from step conditions if present.
+        $conditions = json_decode($step->conditions ?: '{}', true) ?: [];
+        $media_url = $conditions['media_url'] ?? null;
 
-        // Record the send as queued.
-        global $wpdb;
-        $wpdb->insert($wpdb->prefix . 'ams_sends', [
-            'flow_step_id'  => (int) $step->id,
-            'subscriber_id' => (int) $subscriber->id,
-            'channel'       => 'sms',
-            'status'        => 'queued',
-            'created_at'    => current_time('mysql', true),
-        ]);
+        // Queue via SmsSender (creates send record and schedules Action Scheduler job).
+        $sender = new SmsSender();
+        $sender->queue(
+            $subscriber->phone,
+            $body,
+            (int) $subscriber->id,
+            (int) $step->id,
+            0,
+            $media_url
+        );
 
         return true;
-    }
-
-    private function replace_tokens(string $content, object $subscriber): string
-    {
-        $tokens = [
-            '{{first_name}}'  => $subscriber->first_name ?: 'there',
-            '{{last_name}}'   => $subscriber->last_name ?: '',
-            '{{email}}'       => $subscriber->email,
-            '{{site_name}}'   => get_bloginfo('name'),
-        ];
-
-        return str_replace(array_keys($tokens), array_values($tokens), $content);
     }
 }

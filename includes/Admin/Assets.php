@@ -43,6 +43,30 @@ final class Assets
         if (str_contains($screen->id, 'ams-forms')) {
             $this->enqueue_form_builder();
         }
+
+        // SMS campaign manager — only on the SMS page.
+        if (str_contains($screen->id, 'ams-sms')) {
+            $this->enqueue_sms_campaign();
+        }
+    }
+
+    /**
+     * Enqueue the SMS campaign manager bundle.
+     */
+    private function enqueue_sms_campaign(): void
+    {
+        wp_enqueue_script(
+            'ams-sms-campaign',
+            AMS_PLUGIN_URL . 'assets/js/sms-campaign.js',
+            ['wp-element', 'wp-api-fetch'],
+            AMS_VERSION,
+            true
+        );
+
+        wp_localize_script('ams-sms-campaign', 'amsSmsCampaign', [
+            'restUrl' => rest_url('ams/v1/'),
+            'nonce'   => wp_create_nonce('wp_rest'),
+        ]);
     }
 
     /**

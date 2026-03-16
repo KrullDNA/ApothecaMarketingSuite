@@ -50,4 +50,9 @@ if (function_exists('as_unschedule_all_actions')) {
     as_unschedule_all_actions('ams_flow_browse_abandon_check');
     as_unschedule_all_actions('ams_flow_birthday_check');
     as_unschedule_all_actions('ams_predictive_nightly');
+    as_unschedule_all_actions('ams_send_sms_async');
+    as_unschedule_all_actions('ams_send_sms_retry');
 }
+
+// Clean up encrypted SMS credentials.
+delete_option('ams_sms_credentials');
