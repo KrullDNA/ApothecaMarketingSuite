@@ -1,0 +1,192 @@
+/**
+ * Apotheca® Marketing Suite — Reviews Settings styles.
+ */
+
+.ams-rs-wrap {
+    max-width: 800px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 10px 0;
+}
+
+.ams-rs-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.ams-rs-card h3 {
+    margin: 0 0 16px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #111827;
+}
+
+/* Stats grid */
+.ams-rs-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.ams-rs-stat {
+    text-align: center;
+    padding: 12px;
+    background: #f9fafb;
+    border-radius: 6px;
+}
+
+.ams-rs-stat__value {
+    display: block;
+    font-size: 28px;
+    font-weight: 700;
+    color: #7c3aed;
+}
+
+.ams-rs-stat__label {
+    font-size: 12px;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Refresh row */
+.ams-rs-refresh {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 12px;
+    border-top: 1px solid #f3f4f6;
+}
+
+.ams-rs-refresh__time {
+    font-size: 13px;
+    color: #9ca3af;
+}
+
+/* Status indicator */
+.ams-rs-status {
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 16px;
+}
+
+.ams-rs-status--active {
+    background: #ecfdf5;
+    color: #065f46;
+}
+
+.ams-rs-status--warning {
+    background: #fffbeb;
+    color: #92400e;
+}
+
+.ams-rs-status--inactive {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+/* Fields */
+.ams-rs-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 14px;
+}
+
+.ams-rs-field > span {
+    font-size: 13px;
+    font-weight: 500;
+    color: #374151;
+}
+
+.ams-rs-field input,
+.ams-rs-field select {
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: inherit;
+    max-width: 400px;
+}
+
+.ams-rs-field__row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.ams-rs-field__row input {
+    flex: 1;
+}
+
+/* Test result */
+.ams-rs-test-result {
+    margin-top: 6px;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+.ams-rs-test-result--ok {
+    background: #ecfdf5;
+    color: #065f46;
+}
+
+.ams-rs-test-result--error {
+    background: #fef2f2;
+    color: #991b1b;
+}
+
+/* Buttons */
+.ams-rs-btn {
+    padding: 8px 16px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    background: #fff;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    color: #374151;
+    transition: all 0.15s;
+    white-space: nowrap;
+}
+
+.ams-rs-btn:hover {
+    background: #f3f4f6;
+}
+
+.ams-rs-btn--primary {
+    background: #7c3aed;
+    color: #fff;
+    border-color: #7c3aed;
+}
+
+.ams-rs-btn--primary:hover {
+    background: #6d28d9;
+}
+
+.ams-rs-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Toast */
+.ams-rs-toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #065f46;
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 9999;
+}

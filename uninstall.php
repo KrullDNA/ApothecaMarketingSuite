@@ -33,6 +33,7 @@ $tables = [
     $wpdb->prefix . 'ams_attributions',
     $wpdb->prefix . 'ams_analytics_daily',
     $wpdb->prefix . 'ams_ai_log',
+    $wpdb->prefix . 'ams_reviews_cache',
 ];
 
 foreach ($tables as $table) {
@@ -60,6 +61,7 @@ if (function_exists('as_unschedule_all_actions')) {
     as_unschedule_all_actions('ams_ai_generate_email_body');
     as_unschedule_all_actions('ams_send_time_optimise');
     as_unschedule_all_actions('ams_ai_segment_suggestions');
+    as_unschedule_all_actions('ams_refresh_reviews_cache');
 }
 
 // Clean up encrypted credentials.
@@ -68,3 +70,6 @@ delete_option('ams_ai_credentials');
 
 // Clean up email templates.
 delete_option('ams_email_templates');
+
+// Clean up reviews cache metadata.
+delete_option('ams_reviews_last_refresh');

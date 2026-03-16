@@ -117,6 +117,54 @@ final class TokenReplacer
             $tokens['{{ai_product_recommendations}}'] = '';
         }
 
+        // Review gate URL — links to /ams-review-gate/ with subscriber token and order.
+        $review_gate_url = '';
+        if (!empty($subscriber->unsubscribe_token)) {
+            $order_id = 0;
+            if ($order instanceof \WC_Order) {
+                $order_id = $order->get_id();
+            } elseif (!empty($context['order_id'])) {
+                $order_id = (int) $context['order_id'];
+            }
+            $review_gate_url = add_query_arg([
+                'token'    => $subscriber->unsubscribe_token,
+                'order_id' => $order_id,
+            ], home_url('/ams-review-gate/'));
+        }
+        $tokens['{{review_gate_url}}'] = $review_gate_url;
+
+        // Review URL — direct product review link (first product from order).
+        $review_url = $context['review_url'] ?? '';
+        if (!$review_url && $order instanceof \WC_Order) {
+            $items = $order->get_items();
+            $first_item = reset($items);
+            if ($first_item) {
+                $product = $first_item->get_product();
+                if ($product) {
+                    $review_url = $product->get_permalink() . '#tab-reviews';
+                }
+            }
+        }
+        $tokens['{{review_url}}'] = $review_url;
+
+        // Support URL.
+        $tokens['{{support_url}}'] = $context['support_url'] ?? home_url('/contact/');
+
+        // Social proof reviews — contextual reviews rendered as HTML.
+        if ($subscriber) {
+            $flow_context = $context['flow_context'] ?? [];
+            $reviews = \Apotheca\Marketing\Reviews\ReviewSelector::get_reviews_for_context(
+                (int) $subscriber->id,
+                $flow_context,
+                'auto_contextual',
+                0,
+                3
+            );
+            $tokens['{{social_proof_reviews}}'] = \Apotheca\Marketing\Reviews\ReviewSelector::render_html($reviews);
+        } else {
+            $tokens['{{social_proof_reviews}}'] = '';
+        }
+
         return $tokens;
     }
 

@@ -63,6 +63,11 @@ final class Assets
         if (str_contains($screen->id, 'ams-email-editor')) {
             $this->enqueue_email_editor();
         }
+
+        // Reviews settings — only on the Reviews page.
+        if (str_contains($screen->id, 'ams-reviews')) {
+            $this->enqueue_reviews_settings();
+        }
     }
 
     /**
@@ -155,6 +160,32 @@ final class Assets
         );
 
         wp_localize_script('ams-ai-settings', 'amsAiSettings', [
+            'restUrl' => rest_url('ams/v1/'),
+            'nonce'   => wp_create_nonce('wp_rest'),
+        ]);
+    }
+
+    /**
+     * Enqueue the reviews settings bundle.
+     */
+    private function enqueue_reviews_settings(): void
+    {
+        wp_enqueue_style(
+            'ams-reviews-settings',
+            AMS_PLUGIN_URL . 'assets/css/reviews-settings.css',
+            [],
+            AMS_VERSION
+        );
+
+        wp_enqueue_script(
+            'ams-reviews-settings',
+            AMS_PLUGIN_URL . 'assets/js/reviews-settings.js',
+            ['wp-element', 'wp-api-fetch'],
+            AMS_VERSION,
+            true
+        );
+
+        wp_localize_script('ams-reviews-settings', 'amsReviewsSettings', [
             'restUrl' => rest_url('ams/v1/'),
             'nonce'   => wp_create_nonce('wp_rest'),
         ]);

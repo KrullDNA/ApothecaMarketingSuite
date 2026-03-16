@@ -48,6 +48,9 @@ final class Settings
             'ai_segment_suggestions_enabled' => true,
             'ai_monthly_token_budget'        => 500000,
             'ai_product_card_template'       => '',
+            'reviews_min_rating'             => 4,
+            'reviews_private_feedback_page'  => 0,
+            'reviews_gate_expiry_hours'      => 72,
         ];
     }
 

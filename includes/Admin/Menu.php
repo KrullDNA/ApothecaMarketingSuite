@@ -89,6 +89,11 @@ final class Menu
                 'callback' => 'render_email_editor',
             ],
             [
+                'slug'     => 'ams-reviews',
+                'title'    => __('Reviews', 'apotheca-marketing-suite'),
+                'callback' => 'render_reviews',
+            ],
+            [
                 'slug'     => 'ams-settings',
                 'title'    => __('Settings', 'apotheca-marketing-suite'),
                 'callback' => 'render_settings',
@@ -153,6 +158,11 @@ final class Menu
     public function render_ai_settings(): void
     {
         $this->render_page_wrapper('AI Settings', 'ai-settings');
+    }
+
+    public function render_reviews(): void
+    {
+        $this->render_page_wrapper('Reviews', 'reviews-settings');
     }
 
     public function render_email_editor(): void

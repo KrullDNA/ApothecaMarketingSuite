@@ -32,7 +32,7 @@ define('AMS_PLUGIN_FILE', __FILE__);
 define('AMS_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('AMS_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('AMS_PLUGIN_BASENAME', plugin_basename(__FILE__));
-define('AMS_DB_VERSION', '1.5.0');
+define('AMS_DB_VERSION', '1.6.0');
 define('AMS_SETTINGS_KEY', 'ams_settings');
 
 /**
@@ -100,6 +100,7 @@ register_deactivation_hook(__FILE__, function (): void {
         as_unschedule_all_actions('ams_ai_generate_email_body');
         as_unschedule_all_actions('ams_send_time_optimise');
         as_unschedule_all_actions('ams_ai_segment_suggestions');
+        as_unschedule_all_actions('ams_refresh_reviews_cache');
     }
 
     flush_rewrite_rules();
@@ -244,6 +245,11 @@ final class Plugin
 
         // Email template editor REST API.
         new API\EmailEditorController();
+
+        // Reviews integration — cache refresh, gate handler, REST API.
+        new Reviews\CacheRefresher();
+        new Reviews\ReviewGateHandler();
+        new API\ReviewsController();
 
         // Elementor widgets (loaded only when Elementor is active).
         if (did_action('elementor/loaded')) {

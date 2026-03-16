@@ -39,6 +39,7 @@ final class Installer
         $sql .= $this->get_attributions_schema($prefix, $charset_collate);
         $sql .= $this->get_analytics_daily_schema($prefix, $charset_collate);
         $sql .= $this->get_ai_log_schema($prefix, $charset_collate);
+        $sql .= $this->get_reviews_cache_schema($prefix, $charset_collate);
 
         dbDelta($sql);
     }
@@ -281,6 +282,32 @@ final class Installer
             KEY feature (feature),
             KEY subscriber_id (subscriber_id),
             KEY created_at (created_at)
+        ) $charset_collate;\n\n";
+    }
+
+    private function get_reviews_cache_schema(string $prefix, string $charset_collate): string
+    {
+        return "CREATE TABLE {$prefix}ams_reviews_cache (
+            id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+            source varchar(20) DEFAULT 'woocommerce' NOT NULL,
+            product_id bigint(20) unsigned NOT NULL,
+            reviewer_name varchar(100) DEFAULT '' NOT NULL,
+            reviewer_email_hash varchar(64) DEFAULT '' NOT NULL,
+            rating tinyint(1) unsigned DEFAULT 5 NOT NULL,
+            review_title varchar(255) DEFAULT '' NOT NULL,
+            review_body text DEFAULT NULL,
+            review_date datetime DEFAULT NULL,
+            verified_purchase tinyint(1) unsigned DEFAULT 0 NOT NULL,
+            product_name varchar(255) DEFAULT '' NOT NULL,
+            product_image_url varchar(500) DEFAULT '' NOT NULL,
+            product_url varchar(500) DEFAULT '' NOT NULL,
+            cached_at datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+            PRIMARY KEY  (id),
+            KEY product_id (product_id),
+            KEY source (source),
+            KEY rating (rating),
+            KEY cached_at (cached_at),
+            KEY product_rating (product_id, rating)
         ) $charset_collate;\n\n";
     }
 
