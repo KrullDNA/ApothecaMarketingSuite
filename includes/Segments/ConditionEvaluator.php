@@ -255,7 +255,7 @@ final class ConditionEvaluator
 
         // Value can be product ID or SKU.
         $product_id = (int) $value;
-        if ($product_id === 0) {
+        if ($product_id === 0 && function_exists('wc_get_product_id_by_sku')) {
             // Try lookup by SKU.
             $product_id = (int) wc_get_product_id_by_sku($value);
         }
@@ -312,6 +312,10 @@ final class ConditionEvaluator
 
     private function eval_last_order_status(object $subscriber, string $operator, string $value): bool
     {
+        if (!function_exists('wc_get_orders')) {
+            return false;
+        }
+
         $email = $subscriber->email ?? '';
         if (empty($email)) {
             return false;

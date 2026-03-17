@@ -22,6 +22,20 @@ final class SSOHandler
     {
         add_action('init', [$this, 'register_rewrite_rules']);
         add_action('template_redirect', [$this, 'handle_endpoint']);
+        add_filter('login_message', [$this, 'display_sso_error']);
+    }
+
+    /**
+     * Display SSO error notice on the login screen.
+     */
+    public function display_sso_error(string $message): string
+    {
+        if (isset($_GET['ams_sso_error'])) {
+            $message .= '<div id="login_error"><strong>';
+            $message .= esc_html__('Your Marketing Suite login link has expired or has already been used. Please generate a new one from your main store.', 'apotheca-marketing-suite');
+            $message .= '</strong></div>';
+        }
+        return $message;
     }
 
     /**

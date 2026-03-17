@@ -27,6 +27,7 @@ final class SyncIngestor
             'cart_updated'         => $this->handle_cart_updated($payload),
             'product_viewed'       => $this->handle_product_viewed($payload),
             'checkout_started'     => $this->handle_checkout_started($payload),
+            'abandoned_cart'       => $this->handle_abandoned_cart($payload),
             default                => false,
         };
     }
@@ -44,7 +45,7 @@ final class SyncIngestor
         $subscriber_id = $this->find_or_create_subscriber($email, [
             'first_name' => sanitize_text_field($payload['first_name'] ?? ''),
             'last_name'  => sanitize_text_field($payload['last_name'] ?? ''),
-            'source'     => 'registration',
+            'source'     => 'sync_registration',
         ]);
 
         if (!$subscriber_id) {
@@ -222,6 +223,29 @@ final class SyncIngestor
         }
 
         $this->insert_event($subscriber_id, 'started_checkout', $payload);
+
+        return true;
+    }
+
+    /**
+     * abandoned_cart: find subscriber, log event, fire abandoned_cart flow trigger.
+     */
+    private function handle_abandoned_cart(array $payload): bool
+    {
+        $email = sanitize_email($payload['customer_email'] ?? '');
+        if (!$email) {
+            return false;
+        }
+
+        $subscriber_id = $this->find_subscriber_by_email($email);
+        if (!$subscriber_id) {
+            return false;
+        }
+
+        $this->insert_event($subscriber_id, 'abandoned_cart', $payload);
+
+        // Fire abandoned_cart flow trigger.
+        do_action('ams_cart_abandoned', $subscriber_id, $payload);
 
         return true;
     }

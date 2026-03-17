@@ -31,14 +31,26 @@ final class RevenueAttributor
         $this->attr_table  = $wpdb->prefix . 'ams_attributions';
         $this->steps_table = $wpdb->prefix . 'ams_flow_steps';
 
-        add_action('woocommerce_checkout_order_processed', [$this, 'attribute_order'], 30, 3);
+        if (function_exists('WC')) {
+            add_action('woocommerce_checkout_order_processed', [$this, 'attribute_order'], 30, 3);
+        }
     }
 
     /**
      * Attribute revenue when an order is placed.
+     *
+     * @param int      $order_id
+     * @param array    $posted_data
+     * @param object   $order WC_Order instance.
      */
-    public function attribute_order(int $order_id, array $posted_data, \WC_Order $order): void
+    public function attribute_order(int $order_id, array $posted_data, object $order): void
     {
+        // NOTE: On standalone deployment this value is populated via the
+        // AMS ingest endpoint receiving data from the remote WooCommerce
+        // store. This direct WC call only fires if WooCommerce is present.
+        if (!class_exists('WC_Order') || !($order instanceof \WC_Order)) {
+            return;
+        }
         $email = $order->get_billing_email();
         if (empty($email)) {
             return;

@@ -25,9 +25,11 @@ final class CaptureHandler
 
     private function register_hooks(): void
     {
-        // Checkout opt-in checkbox.
-        add_action('woocommerce_review_order_before_submit', [$this, 'render_checkout_optin']);
-        add_action('woocommerce_checkout_order_processed', [$this, 'capture_checkout_subscriber'], 10, 3);
+        if (function_exists('WC')) {
+            // Checkout opt-in checkbox.
+            add_action('woocommerce_review_order_before_submit', [$this, 'render_checkout_optin']);
+            add_action('woocommerce_checkout_order_processed', [$this, 'capture_checkout_subscriber'], 10, 3);
+        }
 
         // Registration capture.
         add_action('user_register', [$this, 'capture_registration_subscriber'], 20, 1);
@@ -39,6 +41,10 @@ final class CaptureHandler
     public function render_checkout_optin(): void
     {
         if (!Settings::get('checkout_optin_enabled', true)) {
+            return;
+        }
+
+        if (!function_exists('woocommerce_form_field')) {
             return;
         }
 
@@ -60,8 +66,11 @@ final class CaptureHandler
      * @param array    $posted_data
      * @param \WC_Order $order
      */
-    public function capture_checkout_subscriber(int $order_id, array $posted_data, \WC_Order $order): void
+    public function capture_checkout_subscriber(int $order_id, array $posted_data, object $order): void
     {
+        if (!class_exists('WC_Order') || !($order instanceof \WC_Order)) {
+            return;
+        }
         // Verify nonce.
         if (!isset($_POST['ams_checkout_nonce']) || !wp_verify_nonce(
             sanitize_text_field(wp_unslash($_POST['ams_checkout_nonce'])),

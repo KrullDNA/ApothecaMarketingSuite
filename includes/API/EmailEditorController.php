@@ -268,6 +268,10 @@ final class EmailEditorController
             $args['s'] = $search;
         }
 
+        if (!function_exists('wc_get_products')) {
+            return new \WP_REST_Response([], 200);
+        }
+
         $products = wc_get_products($args);
         $result   = [];
 
